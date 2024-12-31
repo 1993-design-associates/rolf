@@ -1,0 +1,23 @@
+{
+  "name": "rolf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel app.js --hmr-port 50619"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1993-design-associates/rolf.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1993-design-associates/rolf/issues"
+  },
+  "homepage": "https://github.com/1993-design-associates/rolf#readme",
+  "dependencies": {
+    "parcel": "^2.13.3"
+  }
+}
