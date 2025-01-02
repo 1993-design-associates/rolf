@@ -18,6 +18,17 @@
   },
   "homepage": "https://github.com/1993-design-associates/rolf#readme",
   "dependencies": {
-    "parcel": "^2.13.3"
+    "@dimforge/rapier3d": "^0.14.0",
+    "@dimforge/rapier3d-compat": "^0.14.0",
+    "@parcel/packager-wasm": "^2.13.3",
+    "animejs": "^3.2.2",
+    "detect-gpu": "^5.0.63",
+    "lodash": "^4.17.21",
+    "parcel": "^2.13.3",
+    "parse-color": "^1.0.0",
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-raw": "^2.13.3"
   }
 }
