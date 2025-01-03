@@ -161,6 +161,7 @@ class App {
 	    this.mouse.y = - (event.clientY / this.height) * 2 + 1;
         this.mse.x = event.clientX
         this.mse.y = event.clientY
+        this.threeD.onMouseMove(this.mouse.x, this.mouse.y);
     }
 }
 

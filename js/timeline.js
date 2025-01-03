@@ -23,8 +23,6 @@ class animTimeline {
             step: frames[0].coord.step,
         } : this.axes
 
-        console.log('frames', frames)
-
         let timeline = anime.timeline({
             targets: this.axes,
             easing: "linear",
@@ -55,7 +53,6 @@ class animTimeline {
 
     getVals(yScroll){
         this.timeline.seek(this.timeline.duration * yScroll)
-        console.log(this.axes.step)
         return this.axes
     }
 }

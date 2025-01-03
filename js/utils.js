@@ -52,8 +52,6 @@ const getCoord = (el) => {
             attributes[attr.name] = attr.value;
         }
     }
-    console.log(attributes)
-
     Object.keys(attributes).forEach(key => {
         if (attributes[key].match(/^#[0-9A-F]{6}$/i)) {
             attributes[key] = parseColor(attributes[key]).hex;
@@ -93,4 +91,4 @@ function getRandomNumber(min, max) {
 }
 
 
-export {getRandomNumber, mapRange, hexToRgb, lerpRgba, rgbaToArray, normCoord,normX, normY, getCoord, mapClamp, easeInExpo, easeOutExpo, decodeHtml}
+export {getRandomNumber, mapRange, hexToRgb, lerpRgba, rgbaToArray, normCoord,normX, normY, getCoord, mapClamp, easeInExpo, easeOutExpo, decodeHtml, clamp}
