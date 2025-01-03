@@ -101,15 +101,15 @@ class App {
         });
 
 
-        document.querySelectorAll('a').forEach((e) => {
-            e.addEventListener('mouseenter', ()=>{
-                this.impulses.morph = 1.5
-            })
+        // document.querySelectorAll('a').forEach((e) => {
+        //     e.addEventListener('mouseenter', ()=>{
+        //         this.impulses.morph = 1.5
+        //     })
 
-            e.addEventListener('mouseleave', () =>{
-                this.impulses.morph = 1
-            } )
-        })
+        //     e.addEventListener('mouseleave', () =>{
+        //         this.impulses.morph = 1
+        //     } )
+        // })
     }
 
     storeScroll(){
