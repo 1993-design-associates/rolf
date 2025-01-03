@@ -1,10 +1,6 @@
 import * as THREE from 'three'
-// import frag from '/shaders/mesh.frag'
-// import meshdither from '/shaders/mesh.glsl'
-// import headfrag from'/shaders/head.glsl'
-// import vs from'/shaders/mesh.vert'
-// import vertHead from '/shaders/vertex/head.vert'
-// import vertBody from '/shaders/vertex/body.vert'
+import sphereFrag from '../shaders/sphere/sphereFrag.glsl'
+import sphereHead from '../shaders/sphere/sphereHead.glsl';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { getRandomNumber, mapClamp } from './utils';
 import Sphere from './sphere';
@@ -37,7 +33,7 @@ class ThreeD {
 
                 // Add lighting
                 const light = new THREE.PointLight(0xffffff, 1000);
-                light.position.set(10, 10, 10);
+                light.position.set(0, -10, 5);
                 this.scene.add(light);
 
         //attractor
@@ -47,12 +43,15 @@ class ThreeD {
         //     side : THREE.DoubleSide
         // })
 
-        this.material = new THREE.MeshStandardMaterial({ color: 0xff0000, flatShading: false   });
+        this.material = new THREE.MeshStandardMaterial({ color: 0xF0C464,
+            // depthTest: false, // Disable depth testing
+            // depthWrite: false, // Disable depth writing 
+            flatShading: false,
+            transparent: true,
+            opacity: 0.5});
 
         this.sphereRad = 2
         this.geo = new THREE.IcosahedronGeometry(this.sphereRad,6)
-        this.material.transparent = true;
-        this.material.opacity = 0.5; // Adjust the opacity value as needed
         this.mesh = new THREE.Mesh(this.geo, this.material)
 
             // Create 8 smaller spheres
@@ -76,17 +75,17 @@ class ThreeD {
             this.domEl.style.top = 0
     
             this.lightTop = new THREE.PointLight( 0xffffff, 1000);
-            this.lightBottom = new THREE.PointLight( 0xffffff, 1000);
+            this.lightBack = new THREE.PointLight( 0xffffff, 10000);
             this.scene.add(this.lightTop)
-            this.scene.add(this.lightBottom)
+            this.scene.add(this.lightBack)
             this.lightTop.position.set(-5, 40, 3)
-            this.lightBottom.position.set(10, -40, 50)
+            this.lightBack.position.set(0, 20, -20)
 
-            this.metaballs = new MarchingCubes(96, this.material, false, 90000 );
-            this.metaScale = 7
+            this.metaballs = new MarchingCubes(96, this.material, false, 100000 );
+            this.metaScale = 6.5
             this.metaballs.scale.setScalar( this.metaScale );
             this.metaballs.isolation = 20;
-            this.metaSub = 10 // lightness
+            this.metaSub = 1 // lightness
             this.scene.add(this.metaballs);
 
 
@@ -126,33 +125,53 @@ class ThreeD {
                 console.error('Error loading RAPIER:', error);
             });
 
-        // this.material.onBeforeCompile =  ( shader ) => {
-        //     shader.uniforms.uAttractor = { value: this.attractor.position}
-        //     shader.uniforms.uVelocity = { value: this.velocity}
-        //     shader.vertexShader = shader.vertexShader.replace(
-        //         '#include <uv_pars_vertex>',
-        //         vertHead
-        //     ).replace(
-        //         '#include <uv_vertex>',
-        //         'vUv = uv;'
-        //     ).replace(
-        //         '#include <worldpos_vertex>',
-        //         vertBody
-        //     )
+        this.material.onBeforeCompile =  ( shader ) => {
+            // shader.uniforms.uAttractor = { value: this.attractor.position}
+            // shader.uniforms.uVelocity = { value: this.velocity}
+            // shader.vertexShader = shader.vertexShader.replace(
+            //     '#include <uv_pars_vertex>',
+            //     vertHead
+            // ).replace(
+            //     '#include <uv_vertex>',
+            //     'vUv = uv;'
+            // ).replace(
+            //     '#include <worldpos_vertex>',
+            //     vertBody
+            // )
 
-        //     shader.fragmentShader = shader.fragmentShader.replace(
-        //         '#include <dithering_fragment>',
-        //         meshdither
-        //     ).replace(
-        //         '#define PHONG',
-        //         headfrag
-        //     ).replace(
-        //         '#include <uv_pars_fragment>',
-        //         'varying vec2 vUv;'
-        //     )
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <uv_pars_vertex>',
+                `
+                #include <uv_pars_vertex>
+                ${sphereHead}
+                varying vec2 vUv;
+                `
+            ).replace(
+                '#include <begin_vertex>',
+                `
+                #include <begin_vertex>
+                vUv = uv;
+                `
+            );
 
-        //     this.material.userData.shader = shader
-        // }
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <uv_pars_fragment>',
+                'varying vec2 vUv;'
+            ).replace(
+                '#include <dithering_fragment>',
+                sphereFrag
+            );
+        
+            //.replace(
+            //     '#define PHONG',
+            //     headfrag
+            // ).replace(
+            //     '#include <uv_pars_fragment>',
+            //     'varying vec2 vUv;'
+            // )
+
+            this.material.userData.shader = shader
+        }
 
 
 
@@ -270,7 +289,27 @@ class ThreeD {
 
 
     render() {
-        this.renderer.render(this.scene, this.camera)
+        this.metaballs.layers.set(1);
+
+        this.smallSpheres.forEach(sphere => {
+            if (sphere && sphere.sphere) {
+                sphere.sphere.layers.set(0);
+            }
+        });
+        
+        this.camera.layers.set(0);
+        this.renderer.autoClear = false;
+        this.renderer.render(this.scene, this.camera);
+        
+        this.smallSpheres.forEach(sphere => {
+            if (sphere && sphere.sphere) {
+                sphere.sphere.layers.set(1);
+            }
+        });
+        this.metaballs.layers.set(0);
+        this.renderer.clearDepth();
+        this.renderer.render(this.scene, this.camera);
+        this.renderer.autoClear = true;
     }
 
     onWindowResize(){

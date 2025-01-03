@@ -12,9 +12,11 @@ class animTimeline {
     }
 
     init(){
+        
         let frames = [...document.querySelectorAll('[step]')].map(el => {
             return {el: el, coord: getCoord(el)}
         })
+        console.log(frames)
 
         this.axes = frames[0] ? {
             x: frames[0].coord.x,
@@ -52,6 +54,7 @@ class animTimeline {
     }
 
     getVals(yScroll){
+        if(!this.timeline) return this.axes
         this.timeline.seek(this.timeline.duration * yScroll)
         return this.axes
     }

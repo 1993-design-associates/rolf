@@ -13,7 +13,7 @@ class Sphere {
         this.density = density
         const Geo = new THREE.IcosahedronGeometry(this.radius,3);
         const Mat = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        this.sphere = new THREE.Mesh(Geo, Mat);
+        this.sphere = new THREE.Mesh(Geo, this.material);
         this.parent.add(this.sphere);
         this.scale = { x: 1, y: 1, z: 1 };
     }
