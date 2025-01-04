@@ -22,7 +22,8 @@ class Sphere {
         const bodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(this.position.x, this.position.y, this.position.z)
         .setLinearDamping(10);
         this.body = this.world.createRigidBody(bodyDesc);
-        this.collider = RAPIER.ColliderDesc.ball(this.radius*1.2).setDensity(this.density);
+        this.collider = RAPIER.ColliderDesc.ball(this.radius*1.2)
+        .setDensity(this.density)
         this.world.createCollider(this.collider, this.body);
 
                 // Create an animation to scale the sphere up and down
@@ -62,7 +63,13 @@ class Sphere {
             this.body.addForce(tangentialForce.add(force), true);
 
             let position = this.body.translation();
-            this.sphere.position.set(position.x, position.y, position.z);
+                // Lerp the sphere's position to the body's position
+            let currentPos = this.sphere.position;
+            let lerpFactor = 0.1; // Adjust the lerp factor as needed (0.1 means 10% of the way each frame)
+            let newPos = new THREE.Vector3().lerpVectors(currentPos, position, lerpFactor);
+
+
+            this.sphere.position.set(newPos.x, newPos.y, newPos.z);
             //this.sphere.scale.set(this.scale.x, this.scale.y, this.scale.z);
     }
 }

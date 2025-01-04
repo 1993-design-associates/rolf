@@ -81,8 +81,8 @@ class ThreeD {
             this.lightTop.position.set(-5, 40, 3)
             this.lightBack.position.set(0, 20, -20)
 
-            this.metaballs = new MarchingCubes(96, this.material, false, 100000 );
-            this.metaScale = 6.5
+            this.metaballs = new MarchingCubes(80, this.material, false, 100000 );
+            this.metaScale = 4
             this.metaballs.scale.setScalar( this.metaScale );
             this.metaballs.isolation = 20;
             this.metaSub = 1 // lightness
@@ -93,17 +93,19 @@ class ThreeD {
 
                 this.world = new RAPIER.World({ x: 0, y: 0, z: 0 });
 
-                this.mouseBody = RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 0, 0).setLinearDamping(100);
+                this.mouseBody =  RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, 0, 0)
                 this.mouseRigid = this.world.createRigidBody(this.mouseBody);
                 this.mouseRigid.setRotation({ w: Math.cos(Math.PI / 4), x: Math.sin(Math.PI / 4), y: 0.0, z: 0.0 }, true);
-                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5).setDensity(0.005);
+                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5)
+
+                
                 this.world.createCollider(this.dynamicCollider, this.mouseRigid);
 
                 const debugMouseGeometry =  new THREE.CylinderGeometry(0.25, 0.25, 10, 8, 1);
                 const debugMouseMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000});
                 this.debugMouse = new THREE.Mesh(debugMouseGeometry, debugMouseMaterial);
                 this.debugMouse.rotation.set(Math.PI / 2, 0, 0);
-                // this.scene.add(this.debugMouse);
+                // this.scene.add(this.debugMouse)
 
 
                 for (let i = 0; i < 8; i++) {   
@@ -258,27 +260,14 @@ class ThreeD {
         this.metaballs.update()
 
         if (this.mouseRigid) {
-            this.mouseRigid.resetForces(true);
-            // Calculate the distance to the target mouse position
-            const currentPos = new THREE.Vector3(this.mouseRigid.translation().x, this.mouseRigid.translation().y, this.mouseRigid.translation().z);
-            const targetPos = new THREE.Vector3(this.mouse.x, this.mouse.y, this.mouse.z);
-
-            // Calculate the distance using THREE.Vector3
-            const distance = currentPos.distanceTo(targetPos);
-
-            // Calculate the direction vector
-            const direction = new THREE.Vector3().subVectors(targetPos, currentPos).normalize();
-
-            // Calculate the velocity proportional to the distance
-            const forceMag = 100*distance; // Adjust the scaling factor as needed
-            const force = direction.multiplyScalar(forceMag);
-
-            // Set the linear velocity of the kinematic body
-            this.mouseRigid.addForce(force, true);
+            const currentPos = this.mouseRigid.translation();
+            const targetPos = this.mouse;
+            const lerpFactor = 0.2; // Adjust the lerp factor as needed (0.1 means 10% of the way each frame)
+            const newPos = new THREE.Vector3().lerpVectors(currentPos, targetPos, lerpFactor);
+            this.mouseRigid.setTranslation(newPos);
 
             const position = this.mouseRigid.translation();
             // Update the debug sphere position
-            
             this.debugMouse.position.set(position.x, position.y, position.z);
         }   
     } else {
