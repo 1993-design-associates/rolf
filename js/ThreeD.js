@@ -2,11 +2,20 @@ import * as THREE from 'three'
 import sphereFrag from '../shaders/sphere/sphereFrag.glsl'
 import sphereHead from '../shaders/sphere/sphereHead.glsl';
 import RAPIER from '@dimforge/rapier3d-compat';
-import { getRandomNumber, mapClamp } from './utils';
+import { getRandomNumber, mapClamp, hexToRgb, rgbaToArray } from './utils';
 import Sphere from './sphere';
 import { MarchingCubes } from 'three/examples/jsm/Addons.js';
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
+
+const glsl = x => x;
+
+function sRGBToLinear(hex) {
+    console.log(hexToRgb(hex))
+    let c = new THREE.Color(...hexToRgb(hex));
+    return c;
+}
+
 
 class ThreeD {
     constructor(pixelRatio, tier, app){ //lets set up our three.js scene
@@ -31,10 +40,6 @@ class ThreeD {
 
         this.clock = new THREE.Clock()
 
-                // Add lighting
-                const light = new THREE.PointLight(0xffffff, 1000);
-                light.position.set(0, -10, 5);
-                this.scene.add(light);
 
         //attractor
         // this.material = new THREE.ShaderMaterial({
@@ -43,7 +48,7 @@ class ThreeD {
         //     side : THREE.DoubleSide
         // })
 
-        this.material = new THREE.MeshStandardMaterial({ color: 0xF0C464,
+        this.material = new THREE.MeshStandardMaterial({ color: 0xffffff,
             // depthTest: false, // Disable depth testing
             // depthWrite: false, // Disable depth writing 
             flatShading: false,
@@ -52,7 +57,8 @@ class ThreeD {
 
         this.sphereRad = 2
         this.geo = new THREE.IcosahedronGeometry(this.sphereRad,6)
-        this.mesh = new THREE.Mesh(this.geo, this.material)
+ 
+        this.mesh = new THREE.Mesh(this.geo, this.createMaterial(this.material))
 
             // Create 8 smaller spheres
             this.smallSpheres = [];
@@ -66,7 +72,7 @@ class ThreeD {
             this.scene.add(this.group)
             // this.group.add(this.mesh)
 
-            this.camera.position.z = 10
+            this.camera.position.z = 6
             this.time = 0
             
             this.domEl = this.app.canvasContainer.appendChild( this.renderer.domElement )
@@ -74,20 +80,38 @@ class ThreeD {
             this.domEl.style.position = 'fixed'
             this.domEl.style.top = 0
     
-            this.lightTop = new THREE.PointLight( 0xffffff, 1000);
+            this.lightTop = new THREE.RectAreaLight( 0xffffff, 5.5, 25, 25);
+            this.lightTop.lookAt(0, 0, 0);
             this.lightBack = new THREE.PointLight( 0xffffff, 10000);
             this.scene.add(this.lightTop)
-            this.scene.add(this.lightBack)
-            this.lightTop.position.set(-5, 40, 3)
-            this.lightBack.position.set(0, 20, -20)
+            //this.scene.add(this.lightBack)
+            this.lightTop.position.set(0, -20, 40)
+            this.lightBack.position.set(0, 20, -50)
+            // Add lighting
+            const width = 40;
+            const height = 40;
+            const intensity = 3;
+            const light = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+            light.position.set(0, -40,0);
+            light.lookAt(0, 0, 0);
+            this.scene.add(light);
 
-            this.metaballs = new MarchingCubes(80, this.material, false, 100000 );
-            this.metaScale = 4
+
+            const bbox = new THREE.Box3().setFromObject(this.mesh);
+            this.bboxMin = bbox.min;
+            this.bboxMax = bbox.max;
+
+            this.metaballs = new MarchingCubes(80, this.createMaterial(this.material), false, 100000 );
+            this.metaScale = 4.2
             this.metaballs.scale.setScalar( this.metaScale );
             this.metaballs.isolation = 20;
             this.metaSub = 1 // lightness
             this.scene.add(this.metaballs);
 
+            this.colDark = sRGBToLinear("#2F3720")
+            this.colMid = sRGBToLinear("#F0C464");
+            this.colLight = sRGBToLinear("#FCF6E1");
+            this.colGlow = sRGBToLinear("#C38B38");
 
             RAPIER.init().then(() => {
 
@@ -114,7 +138,7 @@ class ThreeD {
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius);
                     let size = getRandomNumber(0.5, 1);
                     let density = mapClamp(size, 0.5, 1, 5, 2);
-                    let sphere = new Sphere(size*this.smallSphereRadius, this.material, this.group, { x, y, z }, density, this.world);
+                    let sphere = new Sphere(size*this.smallSphereRadius, this.createMaterial(this.material), this.group, { x, y, z }, density, this.world, this.colLight, this.colGlow);
                     sphere.init();   
                     this.smallSpheres.push(sphere)
                 }
@@ -126,20 +150,25 @@ class ThreeD {
             }).catch(error => {
                 console.error('Error loading RAPIER:', error);
             });
+    }
 
-        this.material.onBeforeCompile =  ( shader ) => {
-            // shader.uniforms.uAttractor = { value: this.attractor.position}
-            // shader.uniforms.uVelocity = { value: this.velocity}
-            // shader.vertexShader = shader.vertexShader.replace(
-            //     '#include <uv_pars_vertex>',
-            //     vertHead
-            // ).replace(
-            //     '#include <uv_vertex>',
-            //     'vUv = uv;'
-            // ).replace(
-            //     '#include <worldpos_vertex>',
-            //     vertBody
-            // )
+    createMaterial(baseMaterial, bboxMin, bboxMax) {
+
+
+        // Calculate the bounding box of the mesh
+        const material = baseMaterial.clone();
+        material.onBeforeCompile = (shader) => {
+            shader.uniforms.bboxMin = { value: this.bboxMin.clone() };
+            shader.uniforms.bboxMax = { value: this.bboxMax.clone() };
+            shader.uniforms.minOpacity = { value: 0 };
+            shader.uniforms.maxOpacity = { value: 1.0 };
+            shader.uniforms.fresnelScale = { value: 1.0 };
+            shader.uniforms.maxRadius = { value: this.sphereRad * 2 };
+            // Add color uniforms
+            shader.uniforms.colDark = { value: this.colDark };
+            shader.uniforms.colMid = { value: this.colMid };
+            shader.uniforms.colLight = { value: this.colLight };
+            shader.uniforms.colGlow = { value: this.colGlow };
 
             shader.vertexShader = shader.vertexShader.replace(
                 '#include <uv_pars_vertex>',
@@ -147,36 +176,65 @@ class ThreeD {
                 #include <uv_pars_vertex>
                 ${sphereHead}
                 varying vec2 vUv;
+                varying vec3 vLocalPosition;
                 `
             ).replace(
                 '#include <begin_vertex>',
-                `
+                glsl`
                 #include <begin_vertex>
                 vUv = uv;
+                vLocalPosition = position;
                 `
             );
 
             shader.fragmentShader = shader.fragmentShader.replace(
                 '#include <uv_pars_fragment>',
-                'varying vec2 vUv;'
+                glsl`
+                varying vec2 vUv;
+                varying vec3 vLocalPosition;
+                uniform vec3 bboxMin;
+                uniform vec3 bboxMax;
+                uniform vec3 colDark;
+                uniform vec3 colMid;
+                uniform vec3 colLight;
+                uniform vec3 colGlow;
+                uniform float minOpacity;
+                uniform float maxOpacity;
+                uniform float maxRadius;
+                uniform float fresnelScale;
+
+                struct ColorStop {
+                    float position;
+                    vec3 color;
+                };
+                
+                vec3 ColorRamp(ColorStop colors[4], int numColors, float factor) {
+                    int index = 0;
+                    for (int i = 0; i < numColors - 1; i++) {
+                        ColorStop currentColor = colors[i];
+                        ColorStop nextColor = colors[i + 1];
+                        bool isInBetween = factor >= currentColor.position && factor <= nextColor.position;
+                        index = isInBetween ? i : index;
+                    }
+                    
+                    ColorStop currentColor = colors[index];
+                    ColorStop nextColor = colors[index + 1];
+                
+                    float range = nextColor.position - currentColor.position;
+                    float lerpFactor = (factor - currentColor.position) / range;
+                    lerpFactor = clamp(lerpFactor, 0.0, 1.0);
+                    return mix(currentColor.color, nextColor.color, lerpFactor);
+                }
+                `
             ).replace(
                 '#include <dithering_fragment>',
                 sphereFrag
             );
-        
-            //.replace(
-            //     '#define PHONG',
-            //     headfrag
-            // ).replace(
-            //     '#include <uv_pars_fragment>',
-            //     'varying vec2 vUv;'
-            // )
 
-            this.material.userData.shader = shader
-        }
+            material.userData.shader = shader;
+        };
 
-
-
+        return material;
     }
 
     onMouseMove(x,y){
@@ -218,12 +276,6 @@ class ThreeD {
         this.group.scale.z = this.vHeight * (size/ this.height);
     }
 
-    setPos(axes){
-        // this.setScale(axes.size)
-        let pos = this.screenToPos(axes.x, axes.y)
-        this.group.position.copy(pos)
-    }
-
     metaPos(pos){
         //Marching cubes use a different coordinate system
         //Transforms the three.js vector position to the metaball coordinate system
@@ -241,6 +293,14 @@ class ThreeD {
     // Check if this.world is initialized
     if (this.world) {
         // Step the RAPIER physics world
+            // Update bounding box uniforms for metaballs
+         // Update bounding box uniforms for metaballs
+         let bboxMin = this.bboxMin.clone().multiplyScalar(1/this.metaScale);
+         let bboxMax = this.bboxMax.clone().multiplyScalar( 1/this.metaScale);
+ 
+        this.metaballs.material.userData.shader.uniforms.bboxMin.value.copy(bboxMin);
+        this.metaballs.material.userData.shader.uniforms.bboxMax.value.copy(bboxMax);
+        
         this.world.step();
 
         this.metaballs.reset()
@@ -250,7 +310,7 @@ class ThreeD {
         this.smallSpheres.forEach((sphere, index) => {
             sphere.update(axes)
             let scaledPos = this.metaPos(sphere.sphere.position)
-            this.metaballs.addBall(scaledPos.x, scaledPos.y, scaledPos.z,  this.metaRad(sphere.radius) / 2, this.metaSub,  0xff0000);
+            this.metaballs.addBall(scaledPos.x, scaledPos.y, scaledPos.z,  this.metaRad(sphere.radius) / 3, this.metaSub,  0xff0000);
 
         });
 
@@ -278,6 +338,22 @@ class ThreeD {
 
 
     render() {
+        this.metaballs.layers.set(0);
+        this.smallSpheres.forEach(sphere => {
+            if (sphere && sphere.sphere) {
+                sphere.sphere.layers.set(1);
+            }
+        });
+        if(this.metaballs.material.userData.shader){
+        this.metaballs.material.userData.shader.uniforms.maxRadius.value = this.sphereRad *0.6* (1/this.metaScale);
+        this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1;
+        
+        this.renderer.render(this.scene, this.camera);
+        this.renderer.autoClear = false;
+        this.metaballs.material.userData.shader.uniforms.minOpacity.value = 0;
+        }
+
+        this.renderer.clearDepth();
         this.metaballs.layers.set(1);
 
         this.smallSpheres.forEach(sphere => {
@@ -287,7 +363,6 @@ class ThreeD {
         });
         
         this.camera.layers.set(0);
-        this.renderer.autoClear = false;
         this.renderer.render(this.scene, this.camera);
         
         this.smallSpheres.forEach(sphere => {
@@ -295,6 +370,7 @@ class ThreeD {
                 sphere.sphere.layers.set(1);
             }
         });
+
         this.metaballs.layers.set(0);
         this.renderer.clearDepth();
         this.renderer.render(this.scene, this.camera);

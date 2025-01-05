@@ -4,7 +4,7 @@ import { clamp, getRandomNumber } from './utils.js';
 import anime from 'animejs';
 
 class Sphere {
-    constructor(radius, material, parent, position, density, world) {
+    constructor(radius, material, parent, position, density, world, colLight, colGlow) {
         this.world = world;
         this.radius = radius;
         this.material = material;
@@ -16,6 +16,16 @@ class Sphere {
         this.sphere = new THREE.Mesh(Geo, this.material);
         this.parent.add(this.sphere);
         this.scale = { x: 1, y: 1, z: 1 };
+        this.fresnelScale = getRandomNumber(0.2, 0.5);
+        this.opacity = getRandomNumber(0.5, 1.0);
+        this.minOpacity = getRandomNumber(0.0, 1.0);;
+        if (this.minOpacity< 0.65) {
+            [this.colLight, this.colGlow, this.colDark] = [colGlow, colLight, colLight];
+        } else {
+            this.colLight = colLight;
+            this.colGlow = colGlow;
+            this.colDark = colGlow;
+        }
     }
 
     init() {
@@ -29,9 +39,9 @@ class Sphere {
                 // Create an animation to scale the sphere up and down
                 anime({
                     targets: this.sphere.scale,
-                    x: [0.9, 1.15],
-                    y: [0.9, 1.15],
-                    z: [0.9, 1.15],
+                    x: [0.8, 1.2],
+                    y: [0.8, 1.2],
+                    z: [0.8, 1.2],
                     duration: getRandomNumber(8000, 4000),
                     easing: 'easeInOutSine',
                     loop: true,
@@ -46,9 +56,20 @@ class Sphere {
             let dir = pos.clone().sub(this.parent.position).normalize();
 
             // Calculate the target position based on axes.step
-            let targetDistance = clamp(axes.step*1.5, 1, 3); // Adjust this value as needed
-            let targetPos = dir.multiplyScalar(targetDistance).add(this.parent.position);
+            let targetDistance = clamp(axes.step*1.5, 0.5, 3); // Adjust this value as needed
             
+            let distancefromOrigin = pos.distanceTo(this.parent.position);
+            if(this.material.userData.shader){
+                this.material.userData.shader.uniforms.fresnelScale.value = this.sphere.scale.x * this.fresnelScale;
+                this.material.userData.shader.uniforms.maxOpacity.value = this.opacity*this.sphere.scale.x;
+                this.material.userData.shader.uniforms.minOpacity.value = this.minOpacity*this.sphere.scale.x;
+                this.material.userData.shader.uniforms.colDark.value = this.colDark
+                this.material.userData.shader.uniforms.colMid.value = this.colLight
+                this.material.userData.shader.uniforms.colLight.value = this.colGlow
+                this.material.userData.shader.uniforms.colGlow.value = this.colGlow
+            }
+            
+            let targetPos = dir.multiplyScalar(targetDistance).add(this.parent.position);
             // Calculate the distance to the target position
             let distanceToTarget = pos.distanceTo(targetPos);
             // Apply force to move the sphere towards the target position
