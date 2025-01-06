@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import RAPIER from '@dimforge/rapier3d-compat';
-import { clamp, getRandomNumber } from './utils.js';
+import { clamp, mapClamp, getRandomNumber } from './utils.js';
 import anime from 'animejs';
 
 class Sphere {
@@ -11,20 +11,34 @@ class Sphere {
         this.parent = parent;
         this.position = position;
         this.density = density
+
         const Geo = new THREE.IcosahedronGeometry(this.radius,3);
-        const Mat = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+        const colors = [];
+        const color = new THREE.Color(1.0, 1.0, 0.0);
+        for (let i = 0; i < Geo.attributes.position.count; i++) {
+            colors.push(color.r, color.g, color.b);
+        }
+        Geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         this.sphere = new THREE.Mesh(Geo, this.material);
         this.parent.add(this.sphere);
         this.scale = { x: 1, y: 1, z: 1 };
-        this.fresnelScale = getRandomNumber(0.2, 0.5);
-        this.opacity = getRandomNumber(0.5, 1.0);
-        this.minOpacity = getRandomNumber(0.0, 1.0);;
-        if (this.minOpacity< 0.65) {
+
+        this.fresnelScale = getRandomNumber(0.3, 0.6);
+        this.opacity = getRandomNumber(0.0, 1.0);
+        this.maxOpacity = getRandomNumber(0.7, 1.0);
+        this.distancefromOrigin = 0.0;
+        if (this.minOpacity< 0.5) {
             [this.colLight, this.colGlow, this.colDark] = [colGlow, colLight, colLight];
         } else {
             this.colLight = colLight;
             this.colGlow = colGlow;
             this.colDark = colGlow;
+        }
+
+        this.axes ={
+            opacity : this.opacity,
+            fres: this.fresnelScale,
+            maxOpacity: this.maxOpacity
         }
     }
 
@@ -42,10 +56,22 @@ class Sphere {
                     x: [0.8, 1.2],
                     y: [0.8, 1.2],
                     z: [0.8, 1.2],
-                    duration: getRandomNumber(8000, 4000),
+                    duration: getRandomNumber(8000, 6000),
                     easing: 'easeInOutSine',
                     loop: true,
-                    direction: 'alternate'
+                    direction: 'alternate',
+                    delay: getRandomNumber(500,2000)
+                });
+                anime({
+                    targets: this.axes,
+                    opacity: [0.0, this.opacity],
+                    fres: [this.fresnelScale / 2, this.fresnelScale],
+                    maxOpacity: [this.maxOpacity/2, this.maxOpacity],
+                    duration: getRandomNumber(12000, 4000),
+                    easing: 'easeInOutSine',
+                    loop: true,
+                    direction: 'alternate',
+                    delay: getRandomNumber(500,2000)
                 });
     }
 
@@ -58,14 +84,15 @@ class Sphere {
             // Calculate the target position based on axes.step
             let targetDistance = clamp(axes.step*1.5, 0.5, 3); // Adjust this value as needed
             
-            let distancefromOrigin = pos.distanceTo(this.parent.position);
+            this.distancefromOrigin = pos.distanceTo(this.parent.position);
+
             if(this.material.userData.shader){
-                this.material.userData.shader.uniforms.fresnelScale.value = this.sphere.scale.x * this.fresnelScale;
+                this.material.userData.shader.uniforms.fresnelScale.value = this.axes.fres;
                 this.material.userData.shader.uniforms.maxOpacity.value = this.opacity*this.sphere.scale.x;
-                this.material.userData.shader.uniforms.minOpacity.value = this.minOpacity*this.sphere.scale.x;
+                this.material.userData.shader.uniforms.minOpacity.value = this.axes.opacity;
                 this.material.userData.shader.uniforms.colDark.value = this.colDark
-                this.material.userData.shader.uniforms.colMid.value = this.colLight
-                this.material.userData.shader.uniforms.colLight.value = this.colGlow
+                this.material.userData.shader.uniforms.colMid.value = this.colGlow
+                this.material.userData.shader.uniforms.colLight.value = this.colLight
                 this.material.userData.shader.uniforms.colGlow.value = this.colGlow
             }
             
