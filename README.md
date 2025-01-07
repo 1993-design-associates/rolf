@@ -12,6 +12,8 @@ Details on the Webflow - Parcel.js integration can be found [here](https://www.p
 npm install
 ```
 
+Additionally, you can use the VS code `prettier` and `eslint` plugins for better dev experience.
+
 ## Development
 
 To start the development server with hot reloading:
