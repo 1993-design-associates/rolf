@@ -8,6 +8,7 @@ class animTimeline {
             y: 0,
             size: 0,
             step: 0,
+            opacity: 0
         }
     }
 
@@ -16,13 +17,12 @@ class animTimeline {
         let frames = [...document.querySelectorAll('[step]')].map(el => {
             return {el: el, coord: getCoord(el)}
         })
-        console.log(frames)
-
         this.axes = frames[0] ? {
             x: frames[0].coord.x,
             y: frames[0].coord.y,
             size: frames[0].coord.size,
             step: frames[0].coord.step,
+            opacity: frames[0].coord.opacity,
         } : this.axes
 
         let timeline = anime.timeline({
@@ -42,6 +42,7 @@ class animTimeline {
                 y: frame.coord.y,
                 size: frame.coord.size,
                 step: frame.coord.step,
+                opacity: frame?.coord?.opacity || 0,
                 duration: duration,
                 easing: frame.coord.easing
             }, previousTime)

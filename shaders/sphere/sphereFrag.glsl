@@ -12,6 +12,7 @@
     outgoingLightMax = mix(outgoingLightMax, 1.0-outgoingLightMax, isBack);
 
     outgoingLightMax*= maxOpacity;
+    outgoingLightMax = clamp(outgoingLightMax, 0.0, 1.0);
     vec3 viewDir = normalize(vViewPosition);
     float fresnel = pow(1.0 - dot(viewDir, normal), 0.7*fresnelScale);
     float fresnelSub = pow(1.0 - dot(viewDir, normal), 1.0 * fresnelScale);
@@ -61,7 +62,7 @@
 
     //
     //opacity = max(finalFresnel*maxOpacity, opacity*maxOpacity);
-
+    opacity-= clamp((1.0-inOpacity)- fresnel, 0.0, 1.0);
     opacity-= fresnelSub;
     opacity -= maxFade;
     opacity -= 1.0-fadeOut;
@@ -69,7 +70,7 @@
    
 
     float maxOpacityClamp = clamp(maxOpacity, 0.0, 1.0);
-
+    opacity *= maxOpacity;
 
 
 

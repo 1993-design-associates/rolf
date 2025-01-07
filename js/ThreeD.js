@@ -22,7 +22,7 @@ class ThreeD {
         this.height = window.innerHeight
         this.width = window.innerWidth
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 50, this.width / this.height, 0.1, 1000 );
+        this.camera = new THREE.PerspectiveCamera( 20, this.width / this.height, 0.1, 1000 );
         this.camera.position.z = 10; // Set camera position to view the object
         this.bbox = new THREE.Vector3()
         this.isMobile = tier.isMobile
@@ -38,6 +38,7 @@ class ThreeD {
         this.velocity = new THREE.Vector3()
         this.vectorUtil = new THREE.Vector3()
         this.vHeight = 0
+        this.sphereOpacity = 1.0
 
         this.clock = new THREE.Clock()
 
@@ -60,13 +61,14 @@ class ThreeD {
             this.orbitRadius = 1;
             this.orbitSpeed = 0.1;
             this.group = new THREE.Group()
-    
+            this.lightGroup = new THREE.Group()
 
 
             this.scene.add(this.group)
+            this.scene.add(this.lightGroup)
             // this.group.add(this.mesh)
 
-            this.camera.position.z = 4
+            this.camera.position.z = 10
             this.time = 0
             
             this.domEl = this.app.canvasContainer.appendChild( this.renderer.domElement )
@@ -74,21 +76,21 @@ class ThreeD {
             this.domEl.style.position = 'fixed'
             this.domEl.style.top = 0
     
-            this.lightTop = new THREE.RectAreaLight( 0xffffff, 5.5, 25, 25);
+            this.lightTop = new THREE.RectAreaLight( 0xffffff, 2.0, 25, 25);
             this.lightTop.lookAt(0, 0, 0);
             this.lightBack = new THREE.PointLight( 0xffffff, 10000);
-            this.scene.add(this.lightTop)
-            //this.scene.add(this.lightBack)
+            this.lightGroup.add(this.lightTop)
+            //this.lightGroup.add(this.lightBack)
             this.lightTop.position.set(0, -20, 40)
             this.lightBack.position.set(0, 20, -50)
             // Add lighting
             const width = 40;
             const height = 40;
-            const intensity = 3;
+            const intensity = 3.5;
             const light = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
             light.position.set(0, -40,0);
             light.lookAt(0, 0, 0);
-            this.scene.add(light);
+            this.lightGroup.add(light);
 
 
             const bbox = new THREE.Box3().setFromObject(this.mesh);
@@ -108,8 +110,9 @@ class ThreeD {
 
             this.colDark = sRGBToLinear("#2F3720")
             this.colMid = sRGBToLinear("#F0C464");
-            this.colLight = sRGBToLinear("#FFF");
+            this.colLight = sRGBToLinear("#FCF6E1");
             this.colGlow = sRGBToLinear("#C38B38");
+            this.lightRot = { z: 0.0, x: 0.0}
 
             RAPIER.init().then(() => {
 
@@ -130,7 +133,7 @@ class ThreeD {
                 // this.scene.add(this.debugMouse)
 
                 // CreateSpheres
-                for (let i = 0; i < 5; i++) {   
+                for (let i = 0; i < 6; i++) {   
                     let x = getRandomNumber(-this.orbitRadius, this.orbitRadius);
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius);
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius);
@@ -151,8 +154,6 @@ class ThreeD {
     }
 
     createMaterial(baseMaterial, side = THREE.FrontSide) {
-        console.log(side)
-
         const material = baseMaterial.clone();
         material.side = side;
         
@@ -162,6 +163,7 @@ class ThreeD {
             shader.uniforms.bboxMax = { value: this.bboxMax.clone() };
             shader.uniforms.minOpacity = { value: 0 };
             shader.uniforms.maxOpacity = { value: 1.0 };
+            shader.uniforms.inOpacity = { value: 1.0};
             shader.uniforms.fresnelScale = { value: 1.0 };
             shader.uniforms.maxRadius = { value: this.sphereRad * 2 };
             // Add color uniforms
@@ -209,6 +211,7 @@ class ThreeD {
                 uniform vec3 colGlow;
                 uniform float minOpacity;
                 uniform float maxOpacity;
+                uniform float inOpacity;
                 uniform float maxRadius;
                 uniform float fresnelScale;
                 uniform float offset;
@@ -250,6 +253,8 @@ class ThreeD {
     }
 
     onMouseMove(x,y){
+        this.lightRot.z = mapClamp(x, -1, 1, THREE.MathUtils.degToRad(-30), THREE.MathUtils.degToRad(30))
+        this.lightRot.x = -mapClamp(y, -1, 1, THREE.MathUtils.degToRad(-20), THREE.MathUtils.degToRad(180))
         this.mouse = this.screenToPos(x, y)
         if (isNaN(this.mouse.x) || isNaN(this.mouse.y) || isNaN(this.mouse.z)) {
             console.error('Invalid mouse position:', this.mouse);
@@ -306,7 +311,11 @@ class ThreeD {
     animSpheres(axes){
         // this.setScale(axes.size)
 
-    // Check if this.world is initialized
+   // smoothly lerp lights on mouse move
+    this.lightGroup.rotation.z = THREE.MathUtils.lerp(this.lightGroup.rotation.z, this.lightRot.z, 0.1)
+    this.lightGroup.rotation.x = THREE.MathUtils.lerp(this.lightGroup.rotation.x, this.lightRot.x, 0.1)
+
+         // Check if this.world is initialized
     if (this.world) {
         // Step the RAPIER physics world
             // Update bounding box uniforms for metaballs
@@ -317,6 +326,7 @@ class ThreeD {
          if(this.metaballs.material.userData.shader){ 
         this.metaballs.material.userData.shader.uniforms.bboxMin.value.copy(bboxMin);
         this.metaballs.material.userData.shader.uniforms.bboxMax.value.copy(bboxMax);
+        this.sphereOpacity = THREE.MathUtils.lerp(this.sphereOpacity, 1.0 - (axes.opacity*0.25), 0.01)
          }
         
         this.world.step();
@@ -326,7 +336,7 @@ class ThreeD {
 
         // Sync the positions of the small spheres with their RAPIER bodies
         this.smallSpheres.forEach((sphere, index) => {
-            sphere.update(axes)
+            sphere.update(axes, this.camera)
             let scaledPos = this.metaPos(sphere.sphere.position)
             let scaleFactor = mapClamp(sphere.distancefromOrigin, 1.2, 1.8, 0, 1)
             let opFactor = mapClamp(sphere.distancefromOrigin, 0.8, 1.5, 0, 1)
@@ -374,7 +384,7 @@ class ThreeD {
         this.metaballs.material.userData.shader.uniforms.maxRadius.value = this.sphereRad *0.63* (1/this.metaScale);
         this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1;
         this.metaballs.material.userData.shader.uniforms.colGlow.value = this.colGlow;
-        this.metaballs.material.userData.shader.uniforms.offset.value = 0.03;
+        this.metaballs.material.userData.shader.uniforms.offset.value = 0.0;
 
         this.renderer.render(this.scene, this.camera);
         this.metaballs.material = this.frontMat 
@@ -383,6 +393,7 @@ class ThreeD {
         this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1;
         this.metaballs.material.userData.shader.uniforms.colGlow.value = this.colGlow;
         this.metaballs.material.userData.shader.uniforms.offset.value = 0.03;
+        this.frontMat.userData.shader.uniforms.inOpacity.value = 1.0
         this.renderer.autoClear = false;
 
         this.renderer.render(this.scene, this.camera);
@@ -392,6 +403,8 @@ class ThreeD {
         this.metaballs.material.userData.shader.uniforms.minOpacity.value = 0;
         this.metaballs.material.userData.shader.uniforms.colGlow.value = this.colLight;
         this.metaballs.material.userData.shader.uniforms.offset.value = 0.0;
+
+        this.frontMat.userData.shader.uniforms.inOpacity.value = this.sphereOpacity
     }
 
         this.renderer.clearDepth();

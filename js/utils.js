@@ -80,7 +80,7 @@ const mapRange = (value, low1, high1, low2, high2) => {
 }
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-const mapClamp = (value, low1, high1, low2, high2) =>  clamp(mapRange(value, low1, high1, low2, high2), low2, high2)
+const mapClamp = (value, inMin, inMax, outMin, outMax) => Math.min(Math.max((value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin, outMin), outMax);
 
 const decodeHtml = str => 
   str.replace(/(&#(\d+);)/g, (match, capture, charCode) => 
