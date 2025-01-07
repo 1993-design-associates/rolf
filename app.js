@@ -1,20 +1,19 @@
-
 //https://github.com/martinlaxenaire/curtainsjs/blob/master/examples/multiple-textures/js/multiple.textures.setup.js
 const parceled = true
-import { getGPUTier } from 'detect-gpu';
+import { getGPUTier } from 'detect-gpu'
 
-import anime from 'animejs/lib/anime.es.js';
-import _, { clamp} from 'lodash';
+import anime from 'animejs/lib/anime.es.js'
+import _, { clamp } from 'lodash'
 import ThreeD from './js/ThreeD.js'
 import scrollToId from './js/scrollToId.js'
 import animTimeline from './js/timeline.js'
 
 class App {
-    constructor(tier){
+    constructor(tier) {
         this.timeline = new animTimeline()
         this.tier = tier
-        this.mouse = { x : 0.5, y: 0.5}
-        this.mse = {x: 0, y: 0}
+        this.mouse = { x: 0.5, y: 0.5 }
+        this.mse = { x: 0, y: 0 }
         this.container = document.querySelector('.scrolldom')
         this.canvasContainer = document.querySelector('#canvas')
         this.contHeight = this.container.scrollHeight
@@ -31,22 +30,24 @@ class App {
             effect: 0,
             delta: 0,
         }
-        
-        this.pixelRatio = Math.min(this.tier.tier > 1 ? 1 + this.tier.tier / 2 : 1, window.devicePixelRatio)
+
+        this.pixelRatio = Math.min(
+            this.tier.tier > 1 ? 1 + this.tier.tier / 2 : 1,
+            window.devicePixelRatio
+        )
         this.maxRatio = window.devicePixelRatio
         this.threeD = new ThreeD(this.pixelRatio, this.tier, this)
     }
 
-    init(){
+    init() {
         this.timeline.init()
         this.onScroll()
         this.canvasContainer.style.height = `${this.height}px`
         this.threeD.init()
         this.onLoaded()
-
     }
 
-    onResize(){
+    onResize() {
         this.height = window.innerHeight
         this.contHeight = this.container.scrollHeight
         this.width = window.innerWidth
@@ -58,7 +59,7 @@ class App {
         this.y = 0
         this.scroll.value = 0
         this.container.scrollTop = this.scroll.value
-        this.threeD.onWindowResize()        
+        this.threeD.onWindowResize()
         this.timeline.init()
         this.scroll.value = this.normY * (this.contHeight - this.height)
         this.y = this.scroll.value
@@ -66,7 +67,7 @@ class App {
         this.onScroll()
     }
 
-    onLoaded(){
+    onLoaded() {
         this.container.style.height = '100%'
         this.container.style.overflow = 'hidden'
         // this.stats = new Stats();
@@ -75,31 +76,36 @@ class App {
         // document.body.appendChild( this.stats.dom );
         this.timeline.init()
 
-        let _mouse = _.throttle(this.mouseEvent.bind(this), 16, {'trailing' : true, 'leading': true})
-        let _resize = _.debounce(() => this.onResize(), 100, {'trailing' : true })
-        let _scroll = _.throttle(this.onScroll.bind(this), 16, {'trailing' : true, 'leading': true})
+        let _mouse = _.throttle(this.mouseEvent.bind(this), 16, {
+            trailing: true,
+            leading: true,
+        })
+        let _resize = _.debounce(() => this.onResize(), 100, { trailing: true })
+        let _scroll = _.throttle(this.onScroll.bind(this), 16, {
+            trailing: true,
+            leading: true,
+        })
 
-       document.addEventListener('mousemove', _mouse.bind(this), false);
-       window.addEventListener('scroll', _scroll.bind(this), false)
+        document.addEventListener('mousemove', _mouse.bind(this), false)
+        window.addEventListener('scroll', _scroll.bind(this), false)
 
-    //    this.threeD.setPos(this.origin)
+        //    this.threeD.setPos(this.origin)
 
-       window.addEventListener('resize', ()=> {
-        _resize()
-       })
-
-       window.visualViewport.addEventListener('resize', ()=>{
-        _resize()
-       });
-
-       let observer = new ResizeObserver( ()=>{
+        window.addEventListener('resize', () => {
             _resize()
-       })
+        })
 
-        window.addEventListener("popstate", (event) => {
-           this.storeScroll()
-        });
+        window.visualViewport.addEventListener('resize', () => {
+            _resize()
+        })
 
+        let observer = new ResizeObserver(() => {
+            _resize()
+        })
+
+        window.addEventListener('popstate', (event) => {
+            this.storeScroll()
+        })
 
         // document.querySelectorAll('a').forEach((e) => {
         //     e.addEventListener('mouseenter', ()=>{
@@ -112,22 +118,22 @@ class App {
         // })
     }
 
-    storeScroll(){
+    storeScroll() {
         let slug = window.location.pathname
-        sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop )
+        sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop)
     }
 
-    monitorPerformance(delta){
+    monitorPerformance(delta) {
         this.frames[this.frames.length] = delta
-        if(this.frames.length >= 45){
-           let total = this.frames.reduce((acc, val) => acc + val)
-            if (total / 45 > 1 / 30 && this.pixelRatio > 0.8){
-                let minus = total /45 > 1 / 15 ? 0.15 : 0.1
-                this.pixelRatio =  this.pixelRatio - minus
+        if (this.frames.length >= 45) {
+            let total = this.frames.reduce((acc, val) => acc + val)
+            if (total / 45 > 1 / 30 && this.pixelRatio > 0.8) {
+                let minus = total / 45 > 1 / 15 ? 0.15 : 0.1
+                this.pixelRatio = this.pixelRatio - minus
                 this.threeD.setPixelRatio(this.pixelRatio)
             }
 
-            if(this.pixelRatio < 0.85 && this.hasText){
+            if (this.pixelRatio < 0.85 && this.hasText) {
                 this.removeText()
             }
 
@@ -135,7 +141,7 @@ class App {
         }
     }
 
-    getDelta(){
+    getDelta() {
         let delta = (performance.now() - this.lastFrame) / 1000
         delta = delta > 1.0 ? 1.0 : delta
         this.lastFrame = performance.now()
@@ -143,25 +149,25 @@ class App {
         return delta
     }
 
-    onScroll(e){
-        if(this.canScroll){
-            this.y = document.documentElement.scrollTop || window.scrollY;
+    onScroll(e) {
+        if (this.canScroll) {
+            this.y = document.documentElement.scrollTop || window.scrollY
             this.y = clamp(this.y, 0, this.contHeight - this.height)
         }
     }
 
-    getTimelineValues(){
+    getTimelineValues() {
         this.normY = this.y / (this.contHeight - this.height)
         return this.timeline.getVals(this.normY)
     }
 
-    mouseEvent(event){
+    mouseEvent(event) {
         //event.preventDefault();
-	    this.mouse.x = (event.clientX / this.width) * 2 - 1;
-	    this.mouse.y = - (event.clientY / this.height) * 2 + 1;
+        this.mouse.x = (event.clientX / this.width) * 2 - 1
+        this.mouse.y = -(event.clientY / this.height) * 2 + 1
         this.mse.x = event.clientX
         this.mse.y = event.clientY
-        this.threeD.onMouseMove(this.mouse.x, this.mouse.y);
+        this.threeD.onMouseMove(this.mouse.x, this.mouse.y)
     }
 }
 
@@ -170,17 +176,17 @@ const onReady = async () => {
 
     //GPUTier.tier = 0
 
-    if(GPUTier.tier > 0){
-    // create curtains instance
-    const app = new App(GPUTier)
-    app.init()
-    }else{
-       scrollToId()
-    }  
- }
+    if (GPUTier.tier > 0) {
+        // create curtains instance
+        const app = new App(GPUTier)
+        app.init()
+    } else {
+        scrollToId()
+    }
+}
 
 if (document.readyState !== 'loading') {
-  onReady()
+    onReady()
 } else {
-  document.addEventListener('DOMContentLoaded', onReady)
+    document.addEventListener('DOMContentLoaded', onReady)
 }
