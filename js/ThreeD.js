@@ -253,7 +253,7 @@ class ThreeD {
     }
 
     onMouseMove(x,y){
-        this.lightRot.z = mapClamp(x, -1, 1, THREE.MathUtils.degToRad(-30), THREE.MathUtils.degToRad(30))
+        this.lightRot.z = mapClamp(x, -1, 1, THREE.MathUtils.degToRad(-90), THREE.MathUtils.degToRad(90))
         this.lightRot.x = -mapClamp(y, -1, 1, THREE.MathUtils.degToRad(-20), THREE.MathUtils.degToRad(180))
         this.mouse = this.screenToPos(x, y)
         if (isNaN(this.mouse.x) || isNaN(this.mouse.y) || isNaN(this.mouse.z)) {
