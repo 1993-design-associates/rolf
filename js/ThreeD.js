@@ -3,7 +3,8 @@ import RAPIER from '@dimforge/rapier3d-compat'
 import { getRandomNumber, mapClamp, hexToRgb, rgbaToArray } from './utils'
 import Sphere from './sphere'
 import { MarchingCubes } from 'three/examples/jsm/Addons.js'
-import { sphereMaterial } from './sphereMaterial.js'
+import { sphereMaterial } from './sphereMat.js'
+import { smlSphereMat } from './smlSphereMat.js'
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
 
@@ -213,9 +214,8 @@ class ThreeD {
                     let density = mapClamp(size, 0.45, 1, 5, 2)
                     let sphere = new Sphere(
                         size * this.smallSphereRadius,
-                        sphereMaterial(
+                        smlSphereMat(
                             this.material,
-                            this.bbox,
                             this.colDark,
                             this.colMid,
                             this.colLight,
@@ -333,11 +333,11 @@ class ThreeD {
                 this.metaballs.material.userData.shader.uniforms.bboxMax.value.copy(
                     bboxMax
                 )
-                this.sphereOpacity = THREE.MathUtils.lerp(
-                    this.sphereOpacity,
-                    1.0 - axes.opacity * 0.25,
-                    0.01
-                )
+                // this.sphereOpacity = THREE.MathUtils.lerp(
+                //     this.sphereOpacity,
+                //     1.0 - axes.opacity * 0.25,
+                //     0.01
+                // )
             }
 
             this.world.step()

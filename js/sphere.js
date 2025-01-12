@@ -36,13 +36,15 @@ class Sphere {
         this.parent.add(this.sphere)
         this.scale = { x: 1, y: 1, z: 1 }
 
-        this.fresnelScale = getRandomNumber(0.5, 1.3)
+        this.fresnelScale = getRandomNumber(0.8, 1.3)
         this.opacity = getRandomNumber(0.5, 1.0)
         this.maxOpacity = getRandomNumber(1.0, 1.0)
         this.distancefromOrigin = 0.0
-        if (this.opacity < 0.5) {
+        this.isSwitch = getRandomNumber(0.0, 1.0) < 0.5 ? 1 : 0
+
+        if (getRandomNumber(0.0, 1.0) < 0.4) {
             ;[this.colLight, this.colGlow, this.colDark] = [
-                colGlow,
+                colLight,
                 colLight,
                 colLight,
             ]
@@ -76,24 +78,24 @@ class Sphere {
             x: [0.8, 1.2],
             y: [0.8, 1.2],
             z: [0.8, 1.2],
-            duration: getRandomNumber(8000, 6000),
+            duration: getRandomNumber(24000, 12000),
             easing: 'easeInOutSine',
             loop: true,
             direction: 'alternate',
             delay: getRandomNumber(500, 2000),
-        })
+        }).seek(getRandomNumber(0, 24000))
         anime({
             targets: this.axes,
             opacity: [0.0, this.opacity],
-            fres: [this.fresnelScale / 2, this.fresnelScale],
+            fres: [this.fresnelScale*1.1, this.fresnelScale*0.2],
             maxOpacity: [0.8, 1.0],
             inOpacity: [0.5, 1.0],
-            duration: getRandomNumber(12000, 4000),
+            duration: getRandomNumber(24000, 12000),
             easing: 'easeInOutSine',
             loop: true,
             direction: 'alternate',
             delay: getRandomNumber(500, 2000),
-        })
+        }).seek(getRandomNumber(0, 24000))
     }
 
     calculateVisibleAreaAtDistance(distance, camera) {
@@ -124,6 +126,8 @@ class Sphere {
 
         if (this.material.userData.shader) {
             // Update the shader uniforms
+            this.material.userData.shader.uniforms.isSwitch.value =
+                this.isSwitch
             this.material.userData.shader.uniforms.fresnelScale.value =
                 this.axes.fres
             this.material.userData.shader.uniforms.maxOpacity.value =
