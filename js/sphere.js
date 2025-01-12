@@ -12,7 +12,8 @@ class Sphere {
         density,
         world,
         colLight,
-        colGlow
+        colGlow,
+        boundaryRadius
     ) {
         this.world = world
         this.radius = radius
@@ -20,6 +21,9 @@ class Sphere {
         this.parent = parent
         this.position = position
         this.density = density
+        this.boundaryRadius = boundaryRadius
+        this.damping = 10
+        this.maxDamping = 200
 
         const Geo = new THREE.IcosahedronGeometry(this.radius, 3)
         const colors = []
@@ -57,13 +61,13 @@ class Sphere {
     }
 
     init() {
-        const bodyDesc = RAPIER.RigidBodyDesc.dynamic()
+        this.bodyDesc = RAPIER.RigidBodyDesc.dynamic()
             .setTranslation(this.position.x, this.position.y, this.position.z)
             .setLinearDamping(10)
-        this.body = this.world.createRigidBody(bodyDesc)
+        this.body = this.world.createRigidBody(this.bodyDesc)
         this.collider = RAPIER.ColliderDesc.ball(this.radius * 1.2).setDensity(
             this.density
-        )
+        ).setRestitution(0.2)
         this.world.createCollider(this.collider, this.body)
 
         // Create an animation to scale the sphere up and down
@@ -110,20 +114,22 @@ class Sphere {
         let { x, y, z } = this.body.translation()
         let pos = new THREE.Vector3(x, y, z)
         let dir = pos.clone().sub(this.parent.position).normalize()
+        this.bodyDesc.setLinearDamping( mapClamp(axes.step, 0, 1, this.damping, this.maxDamping))
 
         // Calculate the target position based on axes.step
-        let targetDistance = clamp(axes.step * 1.5, 0.5, 2) // Adjust this value as needed
+        let targetDistance = clamp(axes.step * 1.5, 0.5, 1.8) // Adjust this value as needed
 
         this.distancefromOrigin = pos.distanceTo(this.parent.position)
-        console.log(this.opacity * axes.opacity)
+        //console.log(this.opacity * axes.opacity)
 
         if (this.material.userData.shader) {
+            // Update the shader uniforms
             this.material.userData.shader.uniforms.fresnelScale.value =
                 this.axes.fres
             this.material.userData.shader.uniforms.maxOpacity.value =
                 THREE.MathUtils.lerp(
                     this.material.userData.shader.uniforms.maxOpacity.value,
-                    axes.opacity * 0.5 + 0.5,
+                    axes.opacity,
                     0.01
                 )
             this.material.userData.shader.uniforms.inOpacity.value =
@@ -182,7 +188,7 @@ class Sphere {
             .multiplyScalar(forceMagnitude) // Adjust the force magnitude as needed
         // Calculate the tangential force for circular motion around the z-axis
         let zAxis = new THREE.Vector3(0, 1, 0.2)
-        let orbitSpeed = axes.step * 2 + 0.5 // Adjust the orbit speed as needed
+        let orbitSpeed = 2.5 // Adjust the orbit speed as needed
         let tangentialForce = new THREE.Vector3()
             .crossVectors(dir, zAxis)
             .normalize()
@@ -190,26 +196,32 @@ class Sphere {
 
         this.body.addForce(tangentialForce.add(force), true)
 
+        // Check if the sphere is outside the boundary radius
+        if (pos.length() > this.boundaryRadius - this.radius) {
+            pos.clampLength(0, this.boundaryRadius - this.radius)
+            this.body.setTranslation(pos, true)
+        }
+
         let position = this.body.translation()
         // Lerp the sphere's position to the body's position
         let currentPos = this.sphere.position
         let lerpFactor = 0.1 // Adjust the lerp factor as needed (0.1 means 10% of the way each frame)
-
-        position.x = clamp(
-            position.x,
-            visibleArea.minX + this.radius,
-            visibleArea.maxX - this.radius
-        )
-        position.y = clamp(
-            position.y,
-            visibleArea.minY + this.radius,
-            visibleArea.maxY - this.radius
-        )
-        position.z = clamp(
-            position.y,
-            -camera.position.z + this.radius,
-            camera.position.z - this.radius
-        )
+        
+        // position.x = clamp(
+        //     position.x,
+        //     visibleArea.minX + this.radius,
+        //     visibleArea.maxX - this.radius
+        // )
+        // position.y = clamp(
+        //     position.y,
+        //     visibleArea.minY + this.radius,
+        //     visibleArea.maxY - this.radius
+        // )
+        // position.z = clamp(
+        //     position.y,
+        //     -camera.position.z + this.radius,
+        //     camera.position.z - this.radius
+        // )
 
         let newPos = new THREE.Vector3().lerpVectors(
             currentPos,

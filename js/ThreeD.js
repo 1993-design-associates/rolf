@@ -1,14 +1,11 @@
 import * as THREE from 'three'
-import sphereFrag from '../shaders/sphere/sphereFrag.glsl'
-import sphereHead from '../shaders/sphere/sphereHead.glsl'
 import RAPIER from '@dimforge/rapier3d-compat'
 import { getRandomNumber, mapClamp, hexToRgb, rgbaToArray } from './utils'
 import Sphere from './sphere'
 import { MarchingCubes } from 'three/examples/jsm/Addons.js'
+import { sphereMaterial } from './sphereMaterial.js'
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
-
-const glsl = (x) => x
 
 function sRGBToLinear(hex) {
     let c = new THREE.Color(...hexToRgb(hex))
@@ -18,6 +15,12 @@ function sRGBToLinear(hex) {
 class ThreeD {
     constructor(pixelRatio, tier, app) {
         //lets set up our three.js scene
+
+        this.colDark = sRGBToLinear('#2F3720')
+        this.colMid = sRGBToLinear('#F0C464')
+        this.colLight = sRGBToLinear('#FCF6E1')
+        this.colGlow = sRGBToLinear('#C38B38')
+
         this.app = app
         this.height = window.innerHeight
         this.width = window.innerWidth
@@ -29,7 +32,10 @@ class ThreeD {
             1000
         )
         this.camera.position.z = 10 // Set camera position to view the object
-        this.bbox = new THREE.Vector3()
+        this.bbox = new THREE.Box3(
+            new THREE.Vector3(-1, -1, -1),
+            new THREE.Vector3(1, 1, 1)
+        )
         this.isMobile = tier.isMobile
         this.mouse = new THREE.Vector3(0, 0, 0)
 
@@ -62,7 +68,20 @@ class ThreeD {
         this.sphereRad = 2
         this.geo = new THREE.IcosahedronGeometry(this.sphereRad, 6)
 
-        this.mesh = new THREE.Mesh(this.geo, this.createMaterial(this.material))
+        this.mesh = new THREE.Mesh(
+            this.geo,
+            sphereMaterial(
+                this.material,
+                this.bbox,
+                this.colDark,
+                this.colMid,
+                this.colLight,
+                this.colGlow,
+                this.sphereRad
+            )
+        )
+
+        this.bbox.setFromObject(this.mesh)
 
         // Create 8 smaller spheres
         this.smallSpheres = []
@@ -107,11 +126,15 @@ class ThreeD {
         light.lookAt(0, 0, 0)
         this.lightGroup.add(light)
 
-        const bbox = new THREE.Box3().setFromObject(this.mesh)
-        this.bboxMin = bbox.min
-        this.bboxMax = bbox.max
-
-        this.frontMat = this.createMaterial(this.material)
+        this.frontMat = sphereMaterial(
+            this.material,
+            this.bbox,
+            this.colDark,
+            this.colMid,
+            this.colLight,
+            this.colGlow,
+            this.sphereRad
+        )
 
         this.metaballs = new MarchingCubes(
             80,
@@ -124,14 +147,20 @@ class ThreeD {
         this.metaballs.scale.setScalar(this.metaScale)
         this.metaballs.isolation = 20
         this.metaSub = 1 // lightness
+        this.metaSize = 0
         this.scene.add(this.metaballs)
 
-        this.backMat = this.createMaterial(this.material, THREE.BackSide)
+        this.backMat = sphereMaterial(
+            this.material,
+            this.bbox,
+            this.colDark,
+            this.colMid,
+            this.colLight,
+            this.colGlow,
+            this.sphereRad,
+            THREE.BackSide
+        )
 
-        this.colDark = sRGBToLinear('#2F3720')
-        this.colMid = sRGBToLinear('#F0C464')
-        this.colLight = sRGBToLinear('#FCF6E1')
-        this.colGlow = sRGBToLinear('#C38B38')
         this.lightRot = { z: 0.0, x: 0.0 }
 
         RAPIER.init()
@@ -143,7 +172,7 @@ class ThreeD {
                         0,
                         0,
                         0
-                    )
+                    ).setCcdEnabled(true)
                 this.mouseRigid = this.world.createRigidBody(this.mouseBody)
                 this.mouseRigid.setRotation(
                     {
@@ -154,7 +183,7 @@ class ThreeD {
                     },
                     true
                 )
-                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5)
+                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5).setRestitution(1).setFriction(0)
 
                 this.world.createCollider(this.dynamicCollider, this.mouseRigid)
 
@@ -173,7 +202,7 @@ class ThreeD {
                     debugMouseMaterial
                 )
                 this.debugMouse.rotation.set(Math.PI / 2, 0, 0)
-                // this.scene.add(this.debugMouse)
+                 //this.scene.add(this.debugMouse)
 
                 // CreateSpheres
                 for (let i = 0; i < 6; i++) {
@@ -181,16 +210,25 @@ class ThreeD {
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let size = getRandomNumber(0.8, 1.3)
-                    let density = mapClamp(size, 0.5, 1, 5, 2)
+                    let density = mapClamp(size, 0.45, 1, 5, 2)
                     let sphere = new Sphere(
                         size * this.smallSphereRadius,
-                        this.createMaterial(this.material),
+                        sphereMaterial(
+                            this.material,
+                            this.bbox,
+                            this.colDark,
+                            this.colMid,
+                            this.colLight,
+                            this.colGlow,
+                            this.sphereRad,
+                        ),
                         this.group,
                         { x, y, z },
                         density,
                         this.world,
                         this.colLight,
-                        this.colGlow
+                        this.colGlow,
+                        this.sphereRad*0.8
                     )
                     sphere.init()
                     this.smallSpheres.push(sphere)
@@ -204,120 +242,20 @@ class ThreeD {
             })
     }
 
-    createMaterial(baseMaterial, side = THREE.FrontSide) {
-        const material = baseMaterial.clone()
-        material.side = side
-
-        material.onBeforeCompile = (shader) => {
-            shader.uniforms.offset = { value: 0.0 } // Add the new uniform offset
-            shader.uniforms.bboxMin = { value: this.bboxMin.clone() }
-            shader.uniforms.bboxMax = { value: this.bboxMax.clone() }
-            shader.uniforms.minOpacity = { value: 0 }
-            shader.uniforms.maxOpacity = { value: 1.0 }
-            shader.uniforms.inOpacity = { value: 1.0 }
-            shader.uniforms.fresnelScale = { value: 1.0 }
-            shader.uniforms.maxRadius = { value: this.sphereRad * 2 }
-            // Add color uniforms
-            shader.uniforms.colDark = { value: this.colDark }
-            shader.uniforms.colMid = { value: this.colMid }
-            shader.uniforms.colLight = { value: this.colLight }
-            shader.uniforms.colGlow = { value: this.colGlow }
-            shader.uniforms.isBack = { value: material.side }
-
-            shader.vertexShader = shader.vertexShader
-                .replace(
-                    '#include <uv_pars_vertex>',
-                    `
-                #include <uv_pars_vertex>
-                ${sphereHead}
-                varying vec2 vUv;
-                varying vec3 vLocalPosition;
-                uniform float offset;
-                varying vec3 offsetPosition;
-                varying float vScaleFactor;
-                `
-                )
-                .replace(
-                    '#include <begin_vertex>',
-                    glsl`
-                #include <begin_vertex>
-                vUv = uv;
-                vec3 offsetDir = normalize(position);
-
-                offsetPosition = position + offsetDir * offset;
-                transformed = offsetPosition;
-                vLocalPosition = offsetPosition;
-                vScaleFactor = color.b;
-                `
-                )
-
-            shader.fragmentShader = shader.fragmentShader
-                .replace(
-                    '#include <uv_pars_fragment>',
-                    glsl`
-                varying vec2 vUv;
-                varying vec3 vLocalPosition;
-                uniform vec3 bboxMin;
-                uniform vec3 bboxMax;
-                uniform vec3 colDark;
-                uniform vec3 colMid;
-                uniform vec3 colLight;
-                uniform vec3 colGlow;
-                uniform float minOpacity;
-                uniform float maxOpacity;
-                uniform float inOpacity;
-                uniform float maxRadius;
-                uniform float fresnelScale;
-                uniform float offset;
-                uniform float isBack;
-                varying float vSharpness;
-                varying float vScaleFactor;
-
-                struct ColorStop {
-                    float position;
-                    vec3 color;
-                };
-                
-                vec3 ColorRamp(ColorStop colors[4], int numColors, float factor) {
-                    int index = 0;
-                    for (int i = 0; i < numColors - 1; i++) {
-                        ColorStop currentColor = colors[i];
-                        ColorStop nextColor = colors[i + 1];
-                        bool isInBetween = factor >= currentColor.position && factor <= nextColor.position;
-                        index = isInBetween ? i : index;
-                    }
-                    
-                    ColorStop currentColor = colors[index];
-                    ColorStop nextColor = colors[index + 1];
-                
-                    float range = nextColor.position - currentColor.position;
-                    float lerpFactor = (factor - currentColor.position) / range;
-                    lerpFactor = clamp(lerpFactor, 0.0, 1.0);
-                    return mix(currentColor.color, nextColor.color, lerpFactor);
-                }
-                `
-                )
-                .replace('#include <dithering_fragment>', sphereFrag)
-            material.userData.shader = shader
-        }
-
-        return material
-    }
-
     onMouseMove(x, y) {
         this.lightRot.z = mapClamp(
             x,
             -1,
             1,
-            THREE.MathUtils.degToRad(-90),
-            THREE.MathUtils.degToRad(90)
+            THREE.MathUtils.degToRad(-45),
+            THREE.MathUtils.degToRad(45)
         )
         this.lightRot.x = -mapClamp(
             y,
             -1,
             1,
-            THREE.MathUtils.degToRad(-20),
-            THREE.MathUtils.degToRad(180)
+            THREE.MathUtils.degToRad(-5),
+            THREE.MathUtils.degToRad(15)
         )
         this.mouse = this.screenToPos(x, y)
         if (isNaN(this.mouse.x) || isNaN(this.mouse.y) || isNaN(this.mouse.z)) {
@@ -349,15 +287,6 @@ class ThreeD {
         this.render()
     }
 
-    setScale(size) {
-        let dist = this.camera.position.distanceTo(this.group.position)
-        let vFOV = (this.camera.fov * Math.PI) / 180 // convert vertical fov to radians
-        this.vHeight = 2 * Math.tan(vFOV / 2) * dist // visible height
-        this.group.scale.x = this.vHeight * (size / this.height)
-        this.group.scale.y = this.vHeight * (size / this.height)
-        this.group.scale.z = this.vHeight * (size / this.height)
-    }
-
     metaPos(pos) {
         //Marching cubes use a different coordinate system
         //Transforms the three.js vector position to the metaball coordinate system
@@ -373,13 +302,11 @@ class ThreeD {
     }
 
     animSpheres(axes) {
-        // this.setScale(axes.size)
-
         // smoothly lerp lights on mouse move
         this.lightGroup.rotation.z = THREE.MathUtils.lerp(
             this.lightGroup.rotation.z,
             this.lightRot.z,
-            0.1
+            0.05
         )
         this.lightGroup.rotation.x = THREE.MathUtils.lerp(
             this.lightGroup.rotation.x,
@@ -392,10 +319,10 @@ class ThreeD {
             // Step the RAPIER physics world
             // Update bounding box uniforms for metaballs
             // Update bounding box uniforms for metaballs
-            let bboxMin = this.bboxMin
+            let bboxMin = this.bbox.min
                 .clone()
                 .multiplyScalar(1 / this.metaScale)
-            let bboxMax = this.bboxMax
+            let bboxMax = this.bbox.max
                 .clone()
                 .multiplyScalar(1 / this.metaScale)
 
@@ -417,15 +344,19 @@ class ThreeD {
 
             this.metaballs.reset()
 
+            let cStep = clamp(axes.step, 0, 1)
+
             // Sync the positions of the small spheres with their RAPIER bodies
             this.smallSpheres.forEach((sphere, index) => {
+                sphere.boundaryRadius = THREE.MathUtils.lerp(sphere.boundaryRadius, mapClamp(Math.pow(cStep, 3) , 0, 1, 1, 3), 0.01)
                 sphere.update(axes, this.camera)
+                this.metaSize = mapClamp(sphere.boundaryRadius, 0.7, 5, 0, 1)
                 let scaledPos = this.metaPos(sphere.sphere.position)
                 let scaleFactor = mapClamp(
                     sphere.distancefromOrigin,
                     1.2,
                     1.8,
-                    0,
+                    1.0-this.metaSize,
                     1
                 )
                 let opFactor = mapClamp(
@@ -485,8 +416,13 @@ class ThreeD {
                 sphere.sphere.layers.set(1)
             }
         })
-
+        // we render the scene four times layered on top of each other
+        // once for the back metaball interior,
+        // once for the back metaball exterior,
+        // once for the small spheres
+        // and once for the front metaball exterior
         if (this.metaballs.material.userData.shader) {
+            //render background metaball interior (back Side)
             this.metaballs.material = this.backMat
             this.metaballs.material.userData.shader.uniforms.maxRadius.value =
                 this.sphereRad * 0.63 * (1 / this.metaScale)
@@ -494,8 +430,9 @@ class ThreeD {
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colGlow
             this.metaballs.material.userData.shader.uniforms.offset.value = 0.0
-
             this.renderer.render(this.scene, this.camera)
+
+            // render background metaball exterior (front side)
             this.metaballs.material = this.frontMat
             this.metaballs.material.userData.shader.uniforms.fresnelScale.value = 1.0
             this.metaballs.material.userData.shader.uniforms.maxRadius.value =
@@ -505,9 +442,11 @@ class ThreeD {
                 this.colGlow
             this.metaballs.material.userData.shader.uniforms.offset.value = 0.03
             this.frontMat.userData.shader.uniforms.inOpacity.value = 1.0
-            this.renderer.autoClear = false
 
+            this.renderer.autoClear = false
             this.renderer.render(this.scene, this.camera)
+
+            //reset material for front metaball exterior (front side)
             this.metaballs.material = this.frontMat
             this.metaballs.material.userData.shader.uniforms.fresnelScale.value = 1.0
             this.metaballs.material.userData.shader.uniforms.maxRadius.value =
@@ -522,6 +461,8 @@ class ThreeD {
         }
 
         this.renderer.clearDepth()
+
+        //render interior spheres
         this.metaballs.layers.set(1)
 
         this.smallSpheres.forEach((sphere) => {
@@ -539,6 +480,7 @@ class ThreeD {
             }
         })
 
+        //render front material
         this.metaballs.layers.set(0)
         this.renderer.clearDepth()
         this.renderer.render(this.scene, this.camera)

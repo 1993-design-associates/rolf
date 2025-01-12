@@ -22,7 +22,7 @@ class animTimeline {
                   y: frames[0].coord.y,
                   size: frames[0].coord.size,
                   step: frames[0].coord.step,
-                  opacity: frames[0].coord.opacity,
+                  opacity: frames[0].coord.opacity || 0,
               }
             : this.axes
 
@@ -35,6 +35,7 @@ class animTimeline {
 
         frames.length > 0 &&
             frames.forEach((frame, index) => {
+                console.log(frame.coord.opacity)
                 let previousTime =
                     index > 0 ? frames[index - 1].coord.keyframe : 0
                 let duration =
@@ -48,7 +49,7 @@ class animTimeline {
                         y: frame.coord.y,
                         size: frame.coord.size,
                         step: frame.coord.step,
-                        opacity: frame?.coord?.opacity || 0,
+                        opacity: frame.coord.opacity || 0,
                         duration: duration,
                         easing: frame.coord.easing,
                     },
