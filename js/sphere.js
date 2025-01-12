@@ -42,7 +42,7 @@ class Sphere {
         this.distancefromOrigin = 0.0
         this.isSwitch = getRandomNumber(0.0, 1.0) < 0.5 ? 1 : 0
 
-        if (getRandomNumber(0.0, 1.0) < 0.4) {
+        if (getRandomNumber(0.0, 1.0) < 0.35) {
             ;[this.colLight, this.colGlow, this.colDark] = [
                 colLight,
                 colLight,
