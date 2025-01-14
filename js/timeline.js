@@ -35,7 +35,7 @@ class animTimeline {
 
         frames.length > 0 &&
             frames.forEach((frame, index) => {
-                console.log(frame.coord.opacity)
+                // console.log(frame.coord.opacity)
                 let previousTime =
                     index > 0 ? frames[index - 1].coord.keyframe : 0
                 let duration =

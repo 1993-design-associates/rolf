@@ -27,7 +27,7 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            20,
+            25,
             this.width / this.height,
             0.1,
             1000
@@ -49,13 +49,13 @@ class ThreeD {
         this.renderer.setClearColor(0x00000000, 0) // Set background color to black
         this.renderer.sortObjects = false
         this.renderer.autoClear = false
-        this.canvas = this.renderer.domElement
+        //this.canvas = this.renderer.domElement
         this.velocity = new THREE.Vector3()
         this.vectorUtil = new THREE.Vector3()
-        this.vHeight = 0
+        //this.vHeight = 0
         this.sphereOpacity = 1.0
 
-        this.clock = new THREE.Clock()
+        //this.clock = new THREE.Clock()
 
         this.material = new THREE.MeshStandardMaterial({
             color: 0xffffff,
@@ -96,14 +96,14 @@ class ThreeD {
         this.scene.add(this.lightGroup)
         // this.group.add(this.mesh)
 
-        this.camera.position.z = 10
+        //this.camera.position.z = 10
         this.time = 0
 
         this.domEl = this.app.canvasContainer.appendChild(
             this.renderer.domElement
         )
         this.domEl.style.zIndex = 10000
-        this.domEl.style.position = 'fixed'
+        this.domEl.style.position = '-webkit-sticky'
         this.domEl.style.top = 0
 
         this.lightTop = new THREE.RectAreaLight(0xffffff, 2.0, 25, 25)
@@ -168,12 +168,9 @@ class ThreeD {
             .then(() => {
                 this.world = new RAPIER.World({ x: 0, y: 0, z: 0 })
 
-                this.mouseBody =
-                    RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(
-                        0,
-                        0,
-                        0
-                    ).setCcdEnabled(true)
+                this.mouseBody = RAPIER.RigidBodyDesc.kinematicPositionBased()
+                    .setTranslation(0, 0, 0)
+                    .setCcdEnabled(true)
                 this.mouseRigid = this.world.createRigidBody(this.mouseBody)
                 this.mouseRigid.setRotation(
                     {
@@ -184,7 +181,9 @@ class ThreeD {
                     },
                     true
                 )
-                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5).setRestitution(1).setFriction(0)
+                this.dynamicCollider = RAPIER.ColliderDesc.cylinder(100, 0.5)
+                    .setRestitution(1)
+                    .setFriction(0)
 
                 this.world.createCollider(this.dynamicCollider, this.mouseRigid)
 
@@ -203,7 +202,7 @@ class ThreeD {
                     debugMouseMaterial
                 )
                 this.debugMouse.rotation.set(Math.PI / 2, 0, 0)
-                 //this.scene.add(this.debugMouse)
+                //this.scene.add(this.debugMouse)
 
                 // CreateSpheres
                 for (let i = 0; i < 6; i++) {
@@ -220,7 +219,7 @@ class ThreeD {
                             this.colMid,
                             this.colLight,
                             this.colGlow,
-                            this.sphereRad,
+                            this.sphereRad
                         ),
                         this.group,
                         { x, y, z },
@@ -228,7 +227,7 @@ class ThreeD {
                         this.world,
                         this.colLight,
                         this.colGlow,
-                        this.sphereRad*0.8
+                        this.sphereRad * 0.8
                     )
                     sphere.init()
                     this.smallSpheres.push(sphere)
@@ -348,7 +347,11 @@ class ThreeD {
 
             // Sync the positions of the small spheres with their RAPIER bodies
             this.smallSpheres.forEach((sphere, index) => {
-                sphere.boundaryRadius = THREE.MathUtils.lerp(sphere.boundaryRadius, mapClamp(Math.pow(cStep, 3) , 0, 1, 1, 3), 0.01)
+                sphere.boundaryRadius = THREE.MathUtils.lerp(
+                    sphere.boundaryRadius,
+                    mapClamp(Math.pow(cStep, 3), 0, 1, 1, 3),
+                    0.01
+                )
                 sphere.update(axes, this.camera)
                 this.metaSize = mapClamp(sphere.boundaryRadius, 0.7, 5, 0, 1)
                 let scaledPos = this.metaPos(sphere.sphere.position)
@@ -356,7 +359,7 @@ class ThreeD {
                     sphere.distancefromOrigin,
                     1.2,
                     1.8,
-                    1.0-this.metaSize,
+                    1.0 - this.metaSize,
                     1
                 )
                 let opFactor = mapClamp(

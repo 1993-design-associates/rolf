@@ -68,8 +68,9 @@ class App {
     }
 
     onLoaded() {
-        this.container.style.height = '100%'
-        this.container.style.overflow = 'hidden'
+        //this.container.style.height = '100%'
+        //this.container.style.overflow = 'hidden'
+
         // this.stats = new Stats();
         // this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
         // this.stats.dom.classList.add('stats');
@@ -99,13 +100,14 @@ class App {
             _resize()
         })
 
-        let observer = new ResizeObserver(() => {
-            _resize()
-        })
+        // let observer = new ResizeObserver(() => {
+        //     _resize()
+        // })
 
-        window.addEventListener('popstate', (event) => {
-            this.storeScroll()
-        })
+        //REMOVED stores location when changing pages
+        // window.addEventListener('popstate', (event) => {
+        //     this.storeScroll()
+        // })
 
         // document.querySelectorAll('a').forEach((e) => {
         //     e.addEventListener('mouseenter', ()=>{
@@ -118,10 +120,10 @@ class App {
         // })
     }
 
-    storeScroll() {
-        let slug = window.location.pathname
-        sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop)
-    }
+    // storeScroll() {
+    //     let slug = window.location.pathname
+    //     sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop)
+    // }
 
     monitorPerformance(delta) {
         this.frames[this.frames.length] = delta
@@ -181,7 +183,7 @@ const onReady = async () => {
         const app = new App(GPUTier)
         app.init()
     } else {
-        scrollToId()
+        //scrollToId()
     }
 }
 
