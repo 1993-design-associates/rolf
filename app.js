@@ -4,9 +4,18 @@ import { getGPUTier } from 'detect-gpu'
 
 import anime from 'animejs/lib/anime.es.js'
 import _, { clamp } from 'lodash'
-import ThreeD from './js/ThreeD.js'
-import scrollToId from './js/scrollToId.js'
-import animTimeline from './js/timeline.js'
+import ThreeD from './threejs/ThreeD.js'
+import scrollToId from './threejs/scrollToId.js'
+import animTimeline from './threejs/timeline.js'
+
+import contactTabClick from '/animations/contactTabClick.js'
+import formTab from '/animations/formTab.js'
+import preloaderAnime from '/animations/preloader.js'
+import smoothScroll from '/animations/smoothScroll.js'
+import btnHover from '/animations/btnHover.js'
+import titleFadeIn from '/animations/titleFadeIn.js'
+import articleClick from '/animations/articleClick.js'
+import gradientHeight from '/animations/gradientHeight.js'
 
 class App {
     constructor(tier) {
@@ -125,31 +134,32 @@ class App {
     //     sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop)
     // }
 
-    monitorPerformance(delta) {
-        this.frames[this.frames.length] = delta
-        if (this.frames.length >= 45) {
-            let total = this.frames.reduce((acc, val) => acc + val)
-            if (total / 45 > 1 / 30 && this.pixelRatio > 0.8) {
-                let minus = total / 45 > 1 / 15 ? 0.15 : 0.1
-                this.pixelRatio = this.pixelRatio - minus
-                this.threeD.setPixelRatio(this.pixelRatio)
-            }
+    // monitorPerformance(delta) {
+    //     //this.frames[this.frames.length] = delta
+    //     this.frames.push(delta)
+    //     if (this.frames.length >= 45) {
+    //         let total = this.frames.reduce((acc, val) => acc + val)
+    //         if (total / 45 > 1 / 30 && this.pixelRatio > 0.8) {
+    //             let minus = total / 45 > 1 / 15 ? 0.15 : 0.1
+    //             this.pixelRatio = this.pixelRatio - minus
+    //             this.threeD.setPixelRatio(this.pixelRatio)
+    //         }
 
-            if (this.pixelRatio < 0.85 && this.hasText) {
-                this.removeText()
-            }
+    //         if (this.pixelRatio < 0.85 && this.hasText) {
+    //             this.removeText()
+    //         }
 
-            this.frames = []
-        }
-    }
+    //         this.frames = []
+    //     }
+    // }
 
-    getDelta() {
-        let delta = (performance.now() - this.lastFrame) / 1000
-        delta = delta > 1.0 ? 1.0 : delta
-        this.lastFrame = performance.now()
-        this.monitorPerformance(delta)
-        return delta
-    }
+    // getDelta() {
+    //     let delta = (performance.now() - this.lastFrame) / 1000
+    //     delta = delta > 1.0 ? 1.0 : delta
+    //     this.lastFrame = performance.now()
+    //     this.monitorPerformance(delta)
+    //     return delta
+    // }
 
     onScroll(e) {
         if (this.canScroll) {
@@ -173,7 +183,19 @@ class App {
     }
 }
 
+const onLoading = () => {
+    gradientHeight()
+}
+
 const onReady = async () => {
+    preloaderAnime()
+    contactTabClick()
+    formTab()
+    smoothScroll()
+    btnHover()
+    titleFadeIn()
+    articleClick()
+
     let GPUTier = await getGPUTier()
 
     //GPUTier.tier = 0
@@ -190,5 +212,7 @@ const onReady = async () => {
 if (document.readyState !== 'loading') {
     onReady()
 } else {
+    //window.addEventListener("load", onReady);
+    document.addEventListener('DOMContentLoaded', onLoading)
     document.addEventListener('DOMContentLoaded', onReady)
 }

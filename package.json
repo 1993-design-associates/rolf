@@ -29,10 +29,12 @@
         "@dimforge/rapier3d-compat": "^0.14.0",
         "@parcel/packager-wasm": "^2.13.3",
         "animejs": "^3.2.2",
+        "lenis": "^1.1.19",
         "detect-gpu": "^5.0.63",
         "lodash": "^4.17.21",
         "parcel": "^2.13.3",
         "parse-color": "^1.0.0",
+        "stats.js": "^0.17.0",
         "three": "^0.172.0"
     },
     "devDependencies": {
