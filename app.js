@@ -23,7 +23,7 @@ class App {
         this.tier = tier
         this.mouse = { x: 0.5, y: 0.5 }
         this.mse = { x: 0, y: 0 }
-        this.container = document.querySelector('.scrolldom')
+        this.container = document.querySelector('#scrolldom')
         this.canvasContainer = document.querySelector('#canvas')
         this.contHeight = this.container.scrollHeight
         this.y = 0
@@ -52,6 +52,7 @@ class App {
         this.timeline.init()
         this.onScroll()
         this.canvasContainer.style.height = `${this.height}px`
+        //this.canvasContainer.style.width = `100%`
         this.threeD.init()
         this.onLoaded()
     }
