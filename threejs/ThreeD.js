@@ -143,7 +143,7 @@ class ThreeD {
         )
 
         this.metaballs = new MarchingCubes(
-            80,
+            60,
             this.frontMat,
             false,
             true,

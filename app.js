@@ -23,9 +23,11 @@ class App {
         this.tier = tier
         this.mouse = { x: 0.5, y: 0.5 }
         this.mse = { x: 0, y: 0 }
-        this.container = document.querySelector('#scrolldom')
+        //this.container = document.querySelector('#scrolldom')
+        this.container = document.documentElement
         this.canvasContainer = document.querySelector('#canvas')
         this.contHeight = this.container.scrollHeight
+        console.log(this.contHeight)
         this.y = 0
         this.normY = 0
         this.canScroll = true
@@ -49,7 +51,7 @@ class App {
     }
 
     init() {
-        this.timeline.init()
+        this.timeline.init(this.contHeight, this.height)
         this.onScroll()
         this.canvasContainer.style.height = `${this.height}px`
         //this.canvasContainer.style.width = `100%`
@@ -70,7 +72,7 @@ class App {
         this.scroll.value = 0
         this.container.scrollTop = this.scroll.value
         this.threeD.onWindowResize()
-        this.timeline.init()
+        this.timeline.init(this.contHeight, this.height)
         this.scroll.value = this.normY * (this.contHeight - this.height)
         this.y = this.scroll.value
         this.container.scrollTop = this.scroll.value
@@ -85,7 +87,7 @@ class App {
         // this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
         // this.stats.dom.classList.add('stats');
         // document.body.appendChild( this.stats.dom );
-        this.timeline.init()
+        this.timeline.init(this.contHeight, this.height)
 
         let _mouse = _.throttle(this.mouseEvent.bind(this), 16, {
             trailing: true,

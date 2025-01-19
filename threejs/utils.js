@@ -45,6 +45,7 @@ const getDistanceFromTop = (el) => {
     if (!el) return 0
     const rect = el.getBoundingClientRect()
     const scrollTop = window.scrollY || document.documentElement.scrollTop
+    console.log(scrollTop, rect.top)
     return rect.top + scrollTop + rect.height / 2 - window.innerHeight / 2
 }
 
