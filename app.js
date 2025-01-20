@@ -56,7 +56,6 @@ class App {
         //this.canvasContainer.style.width = `100%`
         this.threeD.init()
         this.onLoaded()
-
     }
 
     onResize() {
@@ -188,7 +187,6 @@ class App {
 
 const onLoading = () => {
     gradientHeight()
-
 }
 
 const onReady = async () => {
@@ -200,12 +198,11 @@ const onReady = async () => {
     titleFadeIn()
     articleClick()
 
-
     let GPUTier = await getGPUTier()
 
     //GPUTier.tier = 0
 
-    if (GPUTier.tier > 0) {
+    if (GPUTier.tier > 0 && !GPUTier.tier.isMobile) {
         // create curtains instance
         const app = new App(GPUTier)
         app.init()

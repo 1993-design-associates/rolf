@@ -9,6 +9,7 @@ class animTimeline {
             size: 0,
             step: 0,
             opacity: 0,
+            transition: 0,
         }
     }
 
@@ -23,6 +24,7 @@ class animTimeline {
                   size: frames[0].coord.size,
                   step: frames[0].coord.step,
                   opacity: frames[0].coord.opacity || 0,
+                  transition: frames[0].coord.transition || 0,
               }
             : this.axes
 
@@ -50,6 +52,7 @@ class animTimeline {
                         size: frame.coord.size,
                         step: frame.coord.step,
                         opacity: frame.coord.opacity || 0,
+                        transition: frame.coord.transition || 0,
                         duration: duration,
                         easing: frame.coord.easing,
                     },
@@ -67,7 +70,7 @@ class animTimeline {
     }
 
     getVals(yScroll) {
-       // console.log('getVals', yScroll)
+        // console.log('getVals', yScroll)
         //console.log('axes', this.axes)
         if (!this.timeline) return this.axes
         this.timeline.seek(this.timeline.duration * yScroll)

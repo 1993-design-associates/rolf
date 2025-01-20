@@ -1,8 +1,7 @@
 import * as THREE from 'three'
 import RAPIER from '@dimforge/rapier3d-compat'
-import { getRandomNumber, mapClamp, hexToRgb, rgbaToArray } from './utils'
+import { getRandomNumber, mapClamp, hexToRgb, isElementInView } from './utils'
 import Sphere from './sphere'
-import { MarchingCubes } from 'three/examples/jsm/Addons.js'
 import { sphereMaterial } from './sphereMat.js'
 import { smlSphereMat } from './smlSphereMat.js'
 
@@ -33,12 +32,16 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            25,
+            40,
             this.width / this.height,
             0.1,
             1000
         )
-        this.camera.position.z = 10 // Set camera position to view the object
+        this.camera.position.z = 20 // Set camera position to view the object
+        // this.bbox = new THREE.Box3(
+        //     new THREE.Vector3(-1, -1, -1),
+        //     new THREE.Vector3(1, 1, 1)
+        // )
         //this.isMobile = tier.isMobile
         this.mouse = new THREE.Vector3(0, 0, 0)
 
@@ -82,10 +85,7 @@ class ThreeD {
         this.sphereRad = 1.8
         this.geo = new THREE.IcosahedronGeometry(this.sphereRad, 32)
 
-        this.metaballs = new THREE.Mesh(
-            this.geo,
-            this.frontMat
-        )
+        this.metaballs = new THREE.Mesh(this.geo, this.frontMat)
 
         // Create smaller spheres
         this.smallSpheres = []
@@ -321,24 +321,26 @@ class ThreeD {
             })
 
             // Update smallSpheres uniform
-            const smallSpheresData = this.smallSpheres.map(sphere => {
+            const smallSpheresData = this.smallSpheres.map((sphere) => {
                 if (sphere && sphere.sphere && sphere.sphere.position) {
                     const pos = sphere.sphere.position
-                    
+
                     return new THREE.Vector4(pos.x, pos.y, pos.z, sphere.radius)
                 }
                 return new THREE.Vector4(0, 0, 0, 0) // Fallback value
             })
 
             if (this.frontMat.userData.shader) {
-                const smallSpheresUniform = this.frontMat.userData.shader.uniforms.smallSpheres.value
+                const smallSpheresUniform =
+                    this.frontMat.userData.shader.uniforms.smallSpheres.value
                 smallSpheresData.forEach((data, index) => {
                     smallSpheresUniform[index].copy(data)
                 })
             }
-            
+
             if (this.backMat.userData.shader) {
-                const smallSpheresUniform = this.backMat.userData.shader.uniforms.smallSpheres.value
+                const smallSpheresUniform =
+                    this.backMat.userData.shader.uniforms.smallSpheres.value
                 smallSpheresData.forEach((data, index) => {
                     smallSpheresUniform[index].copy(data)
                 })
@@ -471,14 +473,29 @@ class ThreeD {
         this.renderer.setSize(this.width, this.height)
     }
 
+    animateCamera(axes) {
+        // console.log('HERE', axes.transition, this.camera.position.z)
+
+        this.camera.position.z = THREE.MathUtils.lerp(
+            this.camera.position.z,
+            20 - axes.transition * 10,
+            0.09
+        )
+    }
+
     animate() {
         // TBC - Stats
         this.getDelta()
         this.stats.begin()
 
         let axes = this.app.getTimelineValues()
-        this.animSpheres(axes)
-        this.render()
+
+        //console.log(isElementInView(this.app.canvasContainer))
+        if (isElementInView(this.app.canvasContainer)) {
+            this.animateCamera(axes)
+            this.animSpheres(axes)
+            this.render()
+        }
         // TBC - Stats
         this.stats.end()
 
