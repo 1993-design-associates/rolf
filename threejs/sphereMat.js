@@ -17,7 +17,6 @@ export function sphereMaterial(
     const material = baseMaterial.clone()
     material.side = side
     const smallSpheresData = Array.from({ length: numSmallSpheres }, () => new THREE.Vector4(0, 0, 0, 0));
-    console.log(material.side)
 
     material.onBeforeCompile = (shader) => {
         shader.uniforms.offset = { value: 0.0 } // Add the new uniform offset

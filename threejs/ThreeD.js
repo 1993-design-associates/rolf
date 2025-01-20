@@ -266,7 +266,7 @@ class ThreeD {
         this.renderer.render(this.scene, this.camera)
         this.metaballs.material = this.backMat
         // TBC - redundant renderer?
-        this.renderer.render(this.scene, this.camera)
+        //this.renderer.render(this.scene, this.camera)
         this.metaballs.geometry.computeBoundingBox()
         // this.move({ range: 0, x: 0, y: 0, size: 20, rotation: 0, rotRange: 1}, {x: 0, y:0});
         this.animate()

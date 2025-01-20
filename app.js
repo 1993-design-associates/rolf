@@ -27,7 +27,6 @@ class App {
         this.container = document.documentElement
         this.canvasContainer = document.querySelector('#canvas')
         this.contHeight = this.container.scrollHeight
-        console.log(this.contHeight)
         this.y = 0
         this.normY = 0
         this.canScroll = true
