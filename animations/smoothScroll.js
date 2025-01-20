@@ -17,20 +17,21 @@ const smoothScroll = () => {
   };
   requestAnimationFrame(raf);
 
-  // Toggle scroll behavior based on button click
-  const toggleElements = document.querySelectorAll("[data-lenis-toggle]");
-  toggleElements.forEach((element) => {
+  // Start smooth scrolling when element with data-lenis-start is clicked
+  const startElements = document.querySelectorAll("[data-lenis-start]");
+  startElements.forEach((element) => {
     element.addEventListener("click", () => {
-      element.classList.toggle("stop-scroll");
-      if (element.classList.contains("stop-scroll")) {
-        lenis.stop();
-      } else {
-        lenis.start();
-      }
+      lenis.start();
     });
   });
 
-  return lenis; // Return Lenis instance for further use if needed
+  // Stop smooth scrolling when element with data-lenis-stop is clicked
+  const stopElements = document.querySelectorAll("[data-lenis-stop]");
+  stopElements.forEach((element) => {
+    element.addEventListener("click", () => {
+      lenis.stop();
+    });
+  });
 };
 
 export default smoothScroll;
