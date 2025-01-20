@@ -25,7 +25,7 @@ class Sphere {
         this.damping = 10
         this.maxDamping = 200
 
-        const Geo = new THREE.IcosahedronGeometry(this.radius, 3)
+        const Geo = new THREE.IcosahedronGeometry(this.radius, 6)
         const colors = []
         const color = new THREE.Color(1.0, 1.0, 0.0)
         for (let i = 0; i < Geo.attributes.position.count; i++) {

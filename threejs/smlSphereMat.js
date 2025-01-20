@@ -53,7 +53,6 @@ export function smlSphereMat(
                 offsetPosition = position + offsetDir * offset;
                 transformed = offsetPosition;
                 vLocalPosition = offsetPosition;
-                vScaleFactor = color.b;
                 `
             )
 

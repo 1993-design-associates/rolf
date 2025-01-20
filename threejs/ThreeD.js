@@ -21,6 +21,7 @@ class ThreeD {
 
         this.frames = []
         this.pixelRatio = pixelRatio
+        this.numSmallSpheres = 6
 
         this.colDark = sRGBToLinear('#2F3720')
         this.colMid = sRGBToLinear('#F0C464')
@@ -38,10 +39,6 @@ class ThreeD {
             1000
         )
         this.camera.position.z = 10 // Set camera position to view the object
-        this.bbox = new THREE.Box3(
-            new THREE.Vector3(-1, -1, -1),
-            new THREE.Vector3(1, 1, 1)
-        )
         //this.isMobile = tier.isMobile
         this.mouse = new THREE.Vector3(0, 0, 0)
 
@@ -63,33 +60,34 @@ class ThreeD {
         //this.clock = new THREE.Clock()
 
         this.material = new THREE.MeshStandardMaterial({
-            color: 0xffffff,
+            color: new THREE.Color(1.0, 0.0, 0.0),
             flatShading: false,
             transparent: true,
             opacity: 0.5,
-            vertexColors: true,
+            vertexColors: false,
             depthTest: false,
         })
 
-        this.sphereRad = 2
-        this.geo = new THREE.IcosahedronGeometry(this.sphereRad, 6)
-
-        this.mesh = new THREE.Mesh(
-            this.geo,
-            sphereMaterial(
-                this.material,
-                this.bbox,
-                this.colDark,
-                this.colMid,
-                this.colLight,
-                this.colGlow,
-                this.sphereRad
-            )
+        this.frontMat = sphereMaterial(
+            this.material,
+            this.colDark,
+            this.colMid,
+            this.colLight,
+            this.colGlow,
+            this.sphereRad,
+            THREE.FrontSide,
+            this.numSmallSpheres
         )
 
-        this.bbox.setFromObject(this.mesh)
+        this.sphereRad = 1.8
+        this.geo = new THREE.IcosahedronGeometry(this.sphereRad, 32)
 
-        // Create 8 smaller spheres
+        this.metaballs = new THREE.Mesh(
+            this.geo,
+            this.frontMat
+        )
+
+        // Create smaller spheres
         this.smallSpheres = []
         this.smallSphereRadius = 0.3
         this.orbitRadius = 1
@@ -99,7 +97,7 @@ class ThreeD {
 
         this.scene.add(this.group)
         this.scene.add(this.lightGroup)
-        // this.group.add(this.mesh)
+        this.group.add(this.metaballs)
 
         //this.camera.position.z = 10
         //this.time = 0
@@ -132,39 +130,15 @@ class ThreeD {
         light.lookAt(0, 0, 0)
         this.lightGroup.add(light)
 
-        this.frontMat = sphereMaterial(
-            this.material,
-            this.bbox,
-            this.colDark,
-            this.colMid,
-            this.colLight,
-            this.colGlow,
-            this.sphereRad
-        )
-
-        this.metaballs = new MarchingCubes(
-            60,
-            this.frontMat,
-            false,
-            true,
-            100000
-        )
-        this.metaScale = 4.2
-        this.metaballs.scale.setScalar(this.metaScale)
-        this.metaballs.isolation = 20
-        this.metaSub = 1 // lightness
-        this.metaSize = 0
-        this.scene.add(this.metaballs)
-
         this.backMat = sphereMaterial(
             this.material,
-            this.bbox,
             this.colDark,
             this.colMid,
             this.colLight,
             this.colGlow,
             this.sphereRad,
-            THREE.BackSide
+            THREE.BackSide,
+            this.numSmallSpheres
         )
 
         this.lightRot = { z: 0.0, x: 0.0 }
@@ -210,7 +184,7 @@ class ThreeD {
                 //this.scene.add(this.debugMouse)
 
                 // CreateSpheres
-                for (let i = 0; i < 6; i++) {
+                for (let i = 0; i < this.numSmallSpheres; i++) {
                     let x = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius)
@@ -292,8 +266,8 @@ class ThreeD {
         this.renderer.render(this.scene, this.camera)
         this.metaballs.material = this.backMat
         // TBC - redundant renderer?
-        //this.renderer.render(this.scene, this.camera)
-        // this.mesh.geometry.computeBoundingBox()
+        this.renderer.render(this.scene, this.camera)
+        this.metaballs.geometry.computeBoundingBox()
         // this.move({ range: 0, x: 0, y: 0, size: 20, rotation: 0, rotRange: 1}, {x: 0, y:0});
         this.animate()
         this.render()
@@ -329,32 +303,10 @@ class ThreeD {
         // Check if this.world is initialized
         if (this.world) {
             // Step the RAPIER physics world
-            // Update bounding box uniforms for metaballs
-            // Update bounding box uniforms for metaballs
-            let bboxMin = this.bbox.min
-                .clone()
-                .multiplyScalar(1 / this.metaScale)
-            let bboxMax = this.bbox.max
-                .clone()
-                .multiplyScalar(1 / this.metaScale)
-
-            if (this.metaballs.material.userData.shader) {
-                this.metaballs.material.userData.shader.uniforms.bboxMin.value.copy(
-                    bboxMin
-                )
-                this.metaballs.material.userData.shader.uniforms.bboxMax.value.copy(
-                    bboxMax
-                )
-                // this.sphereOpacity = THREE.MathUtils.lerp(
-                //     this.sphereOpacity,
-                //     1.0 - axes.opacity * 0.25,
-                //     0.01
-                // )
-            }
 
             this.world.step()
 
-            this.metaballs.reset()
+            // this.metaballs.reset()
 
             let cStep = clamp(axes.step, 0, 1)
 
@@ -366,44 +318,31 @@ class ThreeD {
                     0.01
                 )
                 sphere.update(axes, this.camera)
-                this.metaSize = mapClamp(sphere.boundaryRadius, 0.7, 5, 0, 1)
-                let scaledPos = this.metaPos(sphere.sphere.position)
-                let scaleFactor = mapClamp(
-                    sphere.distancefromOrigin,
-                    1.2,
-                    1.8,
-                    1.0 - this.metaSize,
-                    1
-                )
-                let opFactor = mapClamp(
-                    sphere.distancefromOrigin,
-                    0.8,
-                    1.5,
-                    0,
-                    1
-                )
-                //console.log(1.0 - scaleFactor)
-                this.metaballs.addBall(
-                    scaledPos.x,
-                    scaledPos.y,
-                    scaledPos.z,
-                    (this.metaRad(sphere.radius) / 3) * (1.0 - scaleFactor),
-                    this.metaSub,
-                    new THREE.Color(1.0, 1.0, opFactor)
-                )
             })
 
-            let scaledPos = this.metaPos(this.mesh.position)
-            this.metaballs.addBall(
-                scaledPos.x,
-                scaledPos.y,
-                scaledPos.z,
-                this.metaRad(this.sphereRad),
-                1,
-                new THREE.Color(1.0, 1.0, 0.0)
-            )
+            // Update smallSpheres uniform
+            const smallSpheresData = this.smallSpheres.map(sphere => {
+                if (sphere && sphere.sphere && sphere.sphere.position) {
+                    const pos = sphere.sphere.position
+                    
+                    return new THREE.Vector4(pos.x, pos.y, pos.z, sphere.radius)
+                }
+                return new THREE.Vector4(0, 0, 0, 0) // Fallback value
+            })
 
-            this.metaballs.update()
+            if (this.frontMat.userData.shader) {
+                const smallSpheresUniform = this.frontMat.userData.shader.uniforms.smallSpheres.value
+                smallSpheresData.forEach((data, index) => {
+                    smallSpheresUniform[index].copy(data)
+                })
+            }
+            
+            if (this.backMat.userData.shader) {
+                const smallSpheresUniform = this.backMat.userData.shader.uniforms.smallSpheres.value
+                smallSpheresData.forEach((data, index) => {
+                    smallSpheresUniform[index].copy(data)
+                })
+            }
 
             if (this.mouseRigid) {
                 const currentPos = this.mouseRigid.translation()
@@ -436,10 +375,6 @@ class ThreeD {
                 this.pixelRatio = this.pixelRatio - minus
                 this.setPixelRatio(this.pixelRatio)
             }
-
-            // if (this.pixelRatio < 0.85 && this.hasText) {
-            //     this.removeText()
-            // }
 
             this.frames = []
         }
@@ -475,7 +410,7 @@ class ThreeD {
                 this.colGlow
             this.metaballs.material.userData.shader.uniforms.offset.value = 0.0
             //TBC - THIS RENDERER POSSIBLY NOT NEEDED
-            //this.renderer.render(this.scene, this.camera)
+            this.renderer.render(this.scene, this.camera)
 
             // render background metaball exterior (front side)
             this.metaballs.material = this.frontMat

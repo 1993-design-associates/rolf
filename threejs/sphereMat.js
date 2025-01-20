@@ -6,21 +6,21 @@ const glsl = (x) => x
 
 export function sphereMaterial(
     baseMaterial,
-    bbox,
     colDark,
     colMid,
     colLight,
     colGlow,
     sphereRad,
-    side = THREE.FrontSide
+    side = THREE.FrontSide,
+    numSmallSpheres = 12
 ) {
     const material = baseMaterial.clone()
     material.side = side
+    const smallSpheresData = Array.from({ length: numSmallSpheres }, () => new THREE.Vector4(0, 0, 0, 0));
+    console.log(material.side)
 
     material.onBeforeCompile = (shader) => {
         shader.uniforms.offset = { value: 0.0 } // Add the new uniform offset
-        shader.uniforms.bboxMin = { value: bbox.min.clone() }
-        shader.uniforms.bboxMax = { value: bbox.max.clone() }
         shader.uniforms.minOpacity = { value: 0 }
         shader.uniforms.maxOpacity = { value: 1.0 }
         shader.uniforms.inOpacity = { value: 1.0 }
@@ -33,6 +33,12 @@ export function sphereMaterial(
         shader.uniforms.colGlow = { value: colGlow }
         shader.uniforms.isBack = { value: material.side }
 
+
+        // pass the size and position of the small Spheres to fragment shader
+        // Define the smallSpheres uniform array with a maximum size
+        shader.uniforms.smallSpheres = { value:  smallSpheresData}
+        shader.uniforms.numSmallSpheres = { value: 6 }
+
         shader.vertexShader = shader.vertexShader
             .replace(
                 '#include <uv_pars_vertex>',
@@ -43,7 +49,9 @@ export function sphereMaterial(
                 varying vec3 vLocalPosition;
                 uniform float offset;
                 varying vec3 offsetPosition;
-                varying float vScaleFactor;
+                varying float vProximity;
+                uniform vec4 smallSpheres[${numSmallSpheres}]; // Maximum size of 100
+                uniform int numSmallSpheres;    // Actual number of small spheres
                 `
             )
             .replace(
@@ -55,19 +63,36 @@ export function sphereMaterial(
 
                 offsetPosition = position + offsetDir * offset;
                 transformed = offsetPosition;
-                vLocalPosition = offsetPosition;
-                vScaleFactor = color.b;
+                vProximity = 0.0;
+
+                // Offset vertices based on proximity to small spheres
+                for (int i = 0; i < numSmallSpheres; i++) {
+                    vec3 spherePos = smallSpheres[i].xyz;
+                    float sphereRadius = smallSpheres[i].w;
+
+                    // Calculate the distance from the vertex to the sphere center
+                    float distance = length(offsetPosition - spherePos);
+
+                    // Calculate the offset factor using smoothstep
+                    float offsetFactor = pow(smoothstep(sphereRadius*4.0, 0.0, distance), 2.0); // Adjust the offset strength as needed
+
+                    float proximity =  smoothstep(sphereRadius*4.0, 0.0, distance);
+                    // Calculate the direction to move the vertex away from the main sphere center
+                    vec3 direction = normalize(offsetPosition);
+                    vProximity = max(vProximity, proximity); // Store the maximum offset factor for the vertex
+                    // Apply the offset
+                    transformed += direction * ( offsetFactor) ; // Adjust the offset strength as needed
+                }
+                vLocalPosition = transformed;
                 `
             )
 
         shader.fragmentShader = shader.fragmentShader
             .replace(
                 '#include <uv_pars_fragment>',
-                glsl`
+                `
                 varying vec2 vUv;
                 varying vec3 vLocalPosition;
-                uniform vec3 bboxMin;
-                uniform vec3 bboxMax;
                 uniform vec3 colDark;
                 uniform vec3 colMid;
                 uniform vec3 colLight;
@@ -79,8 +104,10 @@ export function sphereMaterial(
                 uniform float fresnelScale;
                 uniform float offset;
                 uniform float isBack;
+                uniform vec4 smallSpheres[${numSmallSpheres}]; // Maximum size of 12
+                uniform int numSmallSpheres;    // Actual number of small spheres
                 varying float vSharpness;
-                varying float vScaleFactor;
+                varying float vProximity;
 
                 struct ColorStop {
                     float position;

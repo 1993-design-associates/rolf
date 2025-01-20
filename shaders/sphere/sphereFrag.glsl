@@ -1,11 +1,6 @@
     /*glsl*/
     #include <dithering_fragment>
-    vec2 uv = vUv;
-    float localZ = (vLocalPosition.z - bboxMin.z) / (bboxMax.z - bboxMin.z);
-    float distance = length(vLocalPosition);
-    float fadeOut = 1.0-pow(smoothstep(maxRadius, maxRadius*1.25, distance), 2.0);
-    float glowOut = pow(smoothstep(maxRadius, maxRadius*1.15, distance), 2.0);
- 
+    vec2 uv = vUv; 
     
     float outgoingLightMax = outgoingLight.r;
     outgoingLightMax = clamp(outgoingLightMax, 0.0, 1.0);
@@ -19,7 +14,7 @@
     
 
  
-    fresnelSub = pow(smoothstep(0.0, 0.9, fresnelSub), clamp( (outgoingLightMax*(1.0-minOpacity)) * 16.0, 2.0, 16.0)); // Adjust the power as needed
+    fresnelSub = pow(smoothstep(0.0, 0.9, fresnelSub), clamp( min(((outgoingLightMax)*(1.0-minOpacity)), 1.0-pow(vProximity, 1.0)) * 16.0, 2.0, 16.0)); // Adjust the power as needed
     fresnel = pow(smoothstep(0.0, 0.7, fresnel), 2.0); // Adjust the power as neede
     
     float finalFresnel = (fresnel - fresnelSub);
@@ -49,13 +44,13 @@
 
     vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(1.0, 0.0, outgoingLightMax), 1.0));
     //minColor = mix(minColor, glowColor, fresnelSub);
-    float scaleFactor = vScaleFactor;
-    float maxFade = clamp(fadeOut*scaleFactor, 0.0, 1.0 );
+    float scaleFactor = vProximity;
+    float maxFade = clamp(scaleFactor, 0.0, 1.0 );
 
     vec3 finalColor = mix(rampColor.rgb, minColor, minOpacity);
     // Add Glow
     finalColor = mix(finalColor, glowColor, fresnel);
-    finalColor = mix(finalColor, colMid,  vScaleFactor);
+    finalColor = mix(finalColor, colMid,  vProximity);
     
 
     float opacity = clamp(outgoingLightMax, minOpacity, 1.0);
@@ -65,7 +60,6 @@
     opacity-= clamp((1.0-inOpacity)- fresnel, 0.0, 1.0);
     opacity-= fresnelSub;
     opacity -= maxFade;
-    opacity -= 1.0-fadeOut;
 
    
 
@@ -85,15 +79,10 @@
 
   
     
+  //gl_FragColor = vec4(rampColor, 1.0);
+  //gl_FragColor = vec4(outgoingLightMax, outgoingLightMax, outgoingLightMax, 1.0);
 
-
-
-
-   //gl_FragColor = vec4(fresnel, fresnel, fresnel, 1.0);
-   //gl_FragColor = vec4(finalColor, opacity );
-  //gl_FragColor = vec4(fresnelSub, fresnelSub, fresnelSub, 1.0);
-  //gl_FragColor = vec4(localY, localY, localY, 1.0);
-//gl_FragColor = vec4(fresnel, fresnelSub, 0.0, 1.0);
-//gl_FragColor = vec4(0.0, maxFade, 0.0, 1.0);
-//gl_FragColor = vec4(glowOut, glowOut, glowOut, 1.0);
-//gl_FragColor = vec4(vScaleFactor, vScaleFactor, vScaleFactor, 1.0);
+ //gl_FragColor = vec4(fresnelSub, fresnelSub, fresnelSub,fresnelSub);
+  //gl_FragColor = vec4(fresnel, fresnel, fresnel,fresnel);
+  //  gl_FragColor = vec4(outgoingLightMax, outgoingLightMax, outgoingLightMax, 1.0);
+  //  /gl_FragColor = vec4(outgoingLight.r, outgoingLight.r, outgoingLight.r, 1.0);
