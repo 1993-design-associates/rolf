@@ -1,29 +1,25 @@
 import anime from "animejs";
 
 const homeHeroTextIn = () => {
-  // Split text into letters
   const textElement = document.querySelector('.h1');
-  const text = textElement.textContent;
-  textElement.innerHTML = text
-    .split('')
-    .map(letter => `<span>${letter}</span>`)
+  if (!textElement) return;
+
+  // Split text into letters with spaces as spans
+  textElement.innerHTML = [...textElement.textContent]
+    .map(letter => `<span class="${letter === ' ' ? 'space' : ''}">${letter}</span>`)
     .join('');
 
   // Animate each letter
-  anime({
-    targets: '.h1 span',
-    opacity: [
-      { value: 0, duration: 0 }, // Initial state
-      { value: 1, duration: 900, easing: 'easeOutSine' }
-    ],
-    filter: [
-      { value: 'blur(10px)', duration: 0 }, // Initial blur
-      { value: 'blur(0px)', duration: 800, easing: 'easeOutQuart' }
-    ],
-    delay: anime.stagger(100, { start: 900,from: 'center' })
-  })
-
-
+  anime.timeline({ autoplay: true })
+    .add({
+      targets: '.h1 span',
+      translateY: [50, 0],
+      opacity: [0, 1],
+      filter: ['blur(10px)', 'blur(0px)'],
+      duration: 1500,
+      easing: 'easeOutCubic',
+      delay: anime.stagger(100, { start: 900, from: 'center' }),
+    });
 };
 
 const preloaderAnime = () => {
