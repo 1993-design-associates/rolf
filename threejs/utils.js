@@ -62,9 +62,7 @@ const getCoord = (el) => {
         }
     }
     Object.keys(attributes).forEach((key) => {
-        if (attributes[key].match(/^#[0-9A-F]{6}$/i)) {
-            attributes[key] = parseColor(attributes[key]).hex
-        } else if (!isNaN(attributes[key])) {
+        if (!isNaN(attributes[key])) {
             attributes[key] = parseFloat(attributes[key])
         }
     })
@@ -119,6 +117,17 @@ function getRandomNumber(min, max) {
     return Math.random() * (max - min) + min
 }
 
+function isElementInView(el) {
+    if (el == undefined) return false
+    const rect = el.getBoundingClientRect()
+    const isVisible =
+        rect.top < window.innerHeight - 200 &&
+        rect.bottom > 100 &&
+        rect.left < window.innerWidth &&
+        rect.right > 0
+    return isVisible
+}
+
 export {
     getRandomNumber,
     mapRange,
@@ -134,4 +143,5 @@ export {
     easeOutExpo,
     decodeHtml,
     clamp,
+    isElementInView,
 }
