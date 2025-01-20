@@ -22,7 +22,6 @@ export function smlSphereMat(
         shader.uniforms.maxOpacity = { value: 0.0 }
         shader.uniforms.inOpacity = { value: 1.0 }
         shader.uniforms.fresnelScale = { value: 1.0 }
-        shader.uniforms.maxRadius = { value: sphereRad * 2 }
         // Add color uniforms
         shader.uniforms.colDark = { value: colDark }
         shader.uniforms.colMid = { value: colMid }
@@ -69,7 +68,6 @@ export function smlSphereMat(
                 uniform float minOpacity;
                 uniform float maxOpacity;
                 uniform float inOpacity;
-                uniform float maxRadius;
                 uniform float fresnelScale;
                 uniform float offset;
                 uniform float isSwitch;

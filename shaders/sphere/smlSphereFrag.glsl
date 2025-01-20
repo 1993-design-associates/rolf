@@ -2,8 +2,6 @@
     #include <dithering_fragment>
     vec2 uv = vUv;
     float distance = length(vLocalPosition);
-    float fadeOut = 1.0-pow(smoothstep(maxRadius, maxRadius*1.25, distance), 2.0);
-    float glowOut = pow(smoothstep(maxRadius, maxRadius*1.15, distance), 2.0);
  
     
     float outgoingLightMax = outgoingLight.r;
@@ -49,7 +47,7 @@
     vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(1.0, 0.0, outgoingLightMax), 1.0));
     //minColor = mix(minColor, glowColor, fresnelSub);
     float scaleFactor = vScaleFactor;
-    float maxFade = clamp(fadeOut*scaleFactor, 0.0, 1.0 );
+    float maxFade = clamp(1.0*scaleFactor, 0.0, 1.0 );
 
     vec3 finalColor = mix(rampColor.rgb, minColor, minOpacity);
     // Add Glow
@@ -65,7 +63,6 @@
     opacity-= clamp((1.0-inOpacity)- fresnel, 0.0, 1.0);
      opacity-= fresnelSub;
     opacity -= maxFade;
-    opacity -= 1.0-fadeOut;
 
    
 

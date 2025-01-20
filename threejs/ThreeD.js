@@ -403,8 +403,6 @@ class ThreeD {
         if (this.metaballs.material.userData.shader) {
             //render background metaball interior (back Side)
             this.metaballs.material = this.backMat
-            this.metaballs.material.userData.shader.uniforms.maxRadius.value =
-                this.sphereRad * 0.63 * (1 / this.metaScale)
             this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colGlow
@@ -415,9 +413,6 @@ class ThreeD {
             // render background metaball exterior (front side)
             this.metaballs.material = this.frontMat
             this.metaballs.material.userData.shader.uniforms.fresnelScale.value = 1.0
-
-            this.metaballs.material.userData.shader.uniforms.maxRadius.value =
-                this.sphereRad * 0.65 * (1 / this.metaScale)
             this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colGlow
@@ -432,8 +427,6 @@ class ThreeD {
             //The Largest Contentful Paint (LCP) goes from .7 to .3
             this.metaballs.material = this.frontMat
             this.metaballs.material.userData.shader.uniforms.fresnelScale.value = 1.0
-            this.metaballs.material.userData.shader.uniforms.maxRadius.value =
-                this.sphereRad * 0.63 * (1 / this.metaScale)
             this.metaballs.material.userData.shader.uniforms.minOpacity.value = 0
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colLight
