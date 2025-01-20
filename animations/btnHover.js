@@ -13,9 +13,10 @@ const btnHover = () => {
 
             const animateLetters = (targets, from, to) => anime({
                 targets, translateY: [from, to],
-                delay: anime.stagger(50),
-                duration: 400,
-                easing: 'easeInOutQuad'
+                duration: 1200,
+                easing: 'easeOutExpo',
+                delay: (el, i) => 100 + 30 * i
+
             });
 
             button.addEventListener('mouseenter', () => {
