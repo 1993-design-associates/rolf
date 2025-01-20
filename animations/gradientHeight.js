@@ -1,4 +1,3 @@
-//not working
 const gradientHeight = () => {
     const element = document.querySelector('.bg-wrap'); // Use a class selector
     if (element) { // Ensure the element exists
