@@ -1,4 +1,3 @@
-
 import Lenis from "lenis";
 
 const smoothScroll = () => {
@@ -9,9 +8,8 @@ const smoothScroll = () => {
     gestureOrientation: "vertical", // Scroll direction
     normalizeWheel: false, // Keep natural scroll wheel behavior
     smoothTouch: false, // Disable touch smoothing
-
   });
- 
+
   // Animation frame loop to update Lenis
   const raf = (time) => {
     lenis.raf(time);
@@ -19,8 +17,20 @@ const smoothScroll = () => {
   };
   requestAnimationFrame(raf);
 
+  // Toggle scroll behavior based on button click
+  const toggleElements = document.querySelectorAll("[data-lenis-toggle]");
+  toggleElements.forEach((element) => {
+    element.addEventListener("click", () => {
+      element.classList.toggle("stop-scroll");
+      if (element.classList.contains("stop-scroll")) {
+        lenis.stop();
+      } else {
+        lenis.start();
+      }
+    });
+  });
+
   return lenis; // Return Lenis instance for further use if needed
-  lenis.stop();
 };
 
 export default smoothScroll;
