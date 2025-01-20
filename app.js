@@ -56,6 +56,7 @@ class App {
         //this.canvasContainer.style.width = `100%`
         this.threeD.init()
         this.onLoaded()
+
     }
 
     onResize() {
@@ -187,6 +188,7 @@ class App {
 
 const onLoading = () => {
     gradientHeight()
+
 }
 
 const onReady = async () => {
@@ -197,6 +199,7 @@ const onReady = async () => {
     btnHover()
     titleFadeIn()
     articleClick()
+
 
     let GPUTier = await getGPUTier()
 

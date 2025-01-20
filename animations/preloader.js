@@ -1,6 +1,5 @@
 import anime from "animejs";
 
-
 const homeHeroTextIn = () => {
   // Split text into letters
   const textElement = document.querySelector('.h1');
