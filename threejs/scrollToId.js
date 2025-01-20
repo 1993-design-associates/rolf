@@ -5,7 +5,7 @@ scrollToId = (app) => {
 
     if (container) {
         let slug = window.location.pathname
-        console.log(slug, sessionStorage.getItem(`scroll-${slug}`))
+        //console.log(slug, sessionStorage.getItem(`scroll-${slug}`))
         if (
             window.location.hash &&
             document.querySelector(window.location.hash)
