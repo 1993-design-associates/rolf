@@ -4,7 +4,7 @@ const articleClick = () => {
 
     if (isDesktop) {
         // Select all tabs
-        const tabs = document.querySelectorAll(".article-wrap");
+        const tabs = document.querySelectorAll(".tab-cms-item");
 
         // Add event listeners to all tabs
         tabs.forEach((tab, index) => {
