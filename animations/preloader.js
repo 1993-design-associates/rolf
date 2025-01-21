@@ -2,7 +2,6 @@ import anime from "animejs";
 
 const homeHeroTextIn = () => {
   const textElement = document.querySelector('.h1');
-  if (!textElement) return;
 
   // Split text into letters with spaces as spans
   textElement.innerHTML = [...textElement.textContent]

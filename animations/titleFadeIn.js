@@ -2,7 +2,6 @@ import anime from "animejs";
 
 const titleFadeIn = () => {
     document.querySelectorAll('.h2-display').forEach(el => {
-        console.log(`Processing element:`, el);
 
         // Break text into spans
         el.innerHTML = [...el.textContent]
