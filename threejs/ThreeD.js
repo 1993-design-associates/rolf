@@ -32,7 +32,7 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            30,
+            32,
             this.width / this.height,
             0.1,
             1000
@@ -474,8 +474,11 @@ class ThreeD {
     }
 
     animateCamera(axes) {
-        // console.log('HERE', axes.transition, this.camera.position.z)
-
+        this.app.canvasContainer.style.opacity = THREE.MathUtils.lerp(
+            0.1,
+            axes.transition * 100,
+            0.009
+        )
         this.camera.position.z = THREE.MathUtils.lerp(
             this.camera.position.z,
             20 - axes.transition * 10,
