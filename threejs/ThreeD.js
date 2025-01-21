@@ -37,7 +37,7 @@ class ThreeD {
             0.1,
             1000
         )
-        this.camera.position.z = 20 // Set camera position to view the object
+        this.camera.position.z = 30 // Set camera position to view the object
         // this.bbox = new THREE.Box3(
         //     new THREE.Vector3(-1, -1, -1),
         //     new THREE.Vector3(1, 1, 1)
@@ -243,7 +243,7 @@ class ThreeD {
     }
 
     setPixelRatio(pixelRatio) {
-        console.log('Setting pixel ratio', pixelRatio)
+        //console.log('Setting pixel ratio', pixelRatio)
         this.renderer.setPixelRatio(pixelRatio)
     }
 
@@ -474,8 +474,9 @@ class ThreeD {
     }
 
     animateCamera(axes) {
+        // console.log(axes.transition)
         this.app.canvasContainer.style.opacity = THREE.MathUtils.lerp(
-            0.1,
+            0,
             axes.transition * 100,
             0.009
         )
