@@ -1,6 +1,6 @@
 import anime from "animejs";
 
-const navOpen = () => {
+const burgerMenuOpen = () => {
     const navItems = document.querySelectorAll('.nav-item');
     const burgerMenu = document.querySelector('.burger-menu');
 
@@ -21,4 +21,4 @@ const navOpen = () => {
     });
 };
 
-export default navOpen;
+export default burgerMenuOpen;
