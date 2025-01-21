@@ -20,7 +20,7 @@ class ThreeD {
 
         this.frames = []
         this.pixelRatio = pixelRatio
-        this.numSmallSpheres = 6
+        this.numSmallSpheres = tier.tier > 2 ? 12 : 6
 
         this.colDark = sRGBToLinear('#2F3720')
         this.colMid = sRGBToLinear('#F0C464')
@@ -182,13 +182,12 @@ class ThreeD {
                 )
                 this.debugMouse.rotation.set(Math.PI / 2, 0, 0)
                 //this.scene.add(this.debugMouse)
-
                 // CreateSpheres
                 for (let i = 0; i < this.numSmallSpheres; i++) {
                     let x = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius)
-                    let size = getRandomNumber(0.8, 1.3)
+                    let size = getRandomNumber(0.8, 1.8)
                     let density = mapClamp(size, 0.45, 1, 5, 2)
                     let sphere = new Sphere(
                         size * this.smallSphereRadius,

@@ -55,6 +55,7 @@ const preloaderAnime = () => {
         }),
         complete: function () {
             smoothScroll()
+            document.body.style.overflow = ''
             // Trigger the loader and start the hero text animation
             document.querySelector('#loader-trigger').click()
             homeHeroTextIn()

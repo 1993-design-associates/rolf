@@ -67,9 +67,9 @@ class Sphere {
             .setTranslation(this.position.x, this.position.y, this.position.z)
             .setLinearDamping(10)
         this.body = this.world.createRigidBody(this.bodyDesc)
-        this.collider = RAPIER.ColliderDesc.ball(this.radius * 1.2).setDensity(
-            this.density
-        ).setRestitution(0.2)
+        this.collider = RAPIER.ColliderDesc.ball(this.radius * 1.2)
+            .setDensity(this.density)
+            .setRestitution(0.2)
         this.world.createCollider(this.collider, this.body)
 
         // Create an animation to scale the sphere up and down
@@ -87,7 +87,7 @@ class Sphere {
         anime({
             targets: this.axes,
             opacity: [0.0, this.opacity],
-            fres: [this.fresnelScale*1.1, this.fresnelScale*0.2],
+            fres: [this.fresnelScale * 1.1, this.fresnelScale * 0.2],
             maxOpacity: [0.8, 1.0],
             inOpacity: [0.5, 1.0],
             duration: getRandomNumber(24000, 12000),
@@ -116,12 +116,14 @@ class Sphere {
         let { x, y, z } = this.body.translation()
         let pos = new THREE.Vector3(x, y, z)
         let dir = pos.clone().sub(this.parent.position).normalize()
-        this.bodyDesc.setLinearDamping( mapClamp(axes.step, 0, 1, this.damping, this.maxDamping))
+        this.bodyDesc.setLinearDamping(
+            mapClamp(axes.step, 0, 1, this.damping, this.maxDamping)
+        )
 
         // Calculate the target position based on axes.step
-        let targetDistance = clamp(axes.step * 1.5, 0.5, 1.8) // Adjust this value as needed
+        let targetDistance = clamp(axes.step * 1.5, 0.5, 4.5) // Adjust this value as needed
 
-        this.distancefromOrigin = pos.distanceTo(this.parent.position)
+        this.distancefromOrigin = pos.distanceTo(this.parent.position * 1.5)
         //console.log(this.opacity * axes.opacity)
 
         if (this.material.userData.shader) {
@@ -210,7 +212,7 @@ class Sphere {
         // Lerp the sphere's position to the body's position
         let currentPos = this.sphere.position
         let lerpFactor = 0.1 // Adjust the lerp factor as needed (0.1 means 10% of the way each frame)
-        
+
         // position.x = clamp(
         //     position.x,
         //     visibleArea.minX + this.radius,
