@@ -16,6 +16,8 @@ import btnHover from '/animations/btnHover.js'
 import titleFadeIn from '/animations/titleFadeIn.js'
 import articleClick from '/animations/articleClick.js'
 import gradientHeight from '/animations/gradientHeight.js'
+import textIn from '/animations/textIn.js'
+
 
 class App {
     constructor(tier) {
@@ -197,6 +199,7 @@ const onReady = async () => {
     btnHover()
     titleFadeIn()
     articleClick()
+    textIn()
 
     let GPUTier = await getGPUTier()
 
