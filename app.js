@@ -208,10 +208,9 @@ const onReady = async () => {
         // create curtains instance
         const app = new App(GPUTier)
         app.init()
+    } else {
+        console.log("You've a ** machine. Upgrade now")
     }
-    //else {
-    //scrollToId()
-    //}
 }
 
 if (document.readyState !== 'loading') {

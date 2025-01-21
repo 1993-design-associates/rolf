@@ -23,15 +23,12 @@ const homeHeroTextIn = () => {
         duration: 1500,
         easing: 'easeOutCubic',
         delay: anime.stagger(100, { start: 900, from: 'center' }),
-        complete: function () {
-            smoothScroll()
-        },
     })
 }
 
 const preloaderAnime = () => {
     //disable page scrolling until the preloader and hero text animation finishes
-    //scroll is enabled in line 26
+    //scroll is enabled in line 57
     document.body.style.overflow = 'hidden'
 
     // Set the initial state of the circles
@@ -57,6 +54,7 @@ const preloaderAnime = () => {
                 (document.querySelectorAll('.preloader-circle').length - 1),
         }),
         complete: function () {
+            smoothScroll()
             // Trigger the loader and start the hero text animation
             document.querySelector('#loader-trigger').click()
             homeHeroTextIn()
