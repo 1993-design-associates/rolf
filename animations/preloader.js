@@ -12,7 +12,7 @@ const homeHeroTextIn = () => {
   anime.timeline({ autoplay: true })
     .add({
       targets: '.h1 span',
-      translateY: [50, 0],
+      translateY: [-25, 0],
       opacity: [0, 1],
       filter: ['blur(10px)', 'blur(0px)'],
       duration: 1500,
