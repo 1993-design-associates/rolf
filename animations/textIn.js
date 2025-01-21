@@ -26,8 +26,8 @@ const textIn = () => {
         // Add scroll listener for this element
         const onScroll = () => {
             const rect = el.getBoundingClientRect();
-            const startTrigger = window.innerHeight * 0.85; // 75% of viewport height
-            const endTrigger = window.innerHeight * 0.6; // 25% of viewport height
+            const startTrigger = window.innerHeight * 0.85; 
+            const endTrigger = window.innerHeight * 0.6; 
 
             const scrollPercent = Math.min(
                 Math.max((rect.top - startTrigger) / (endTrigger- startTrigger), 0),

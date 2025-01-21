@@ -10,8 +10,7 @@ const burgerMenuOpen = () => {
             targets: navItems,
             opacity: [0, 1],
             translateX: [-10, 0],
-            delay: anime.stagger(100, { start: 10, duration: 2000 }),
-            duration: 2000, // Animation duration
+            delay: anime.stagger(100, { start: 10, duration: 500 }),
             easing: 'easeOutQuad',
         })
     })
