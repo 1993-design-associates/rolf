@@ -11,7 +11,7 @@ const navOpen = () => {
        anime({
             targets: navItems,
             opacity: [0, 1],
-            translateX: [-50, 0],
+            translateX: [-10, 0],
             delay: anime.stagger(100, { start: 10,  duration: 2000 }),
             duration: 2000, // Animation duration
             easing: 'easeOutQuad',
