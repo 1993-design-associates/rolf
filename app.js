@@ -17,6 +17,8 @@ import titleFadeIn from '/animations/titleFadeIn.js'
 import articleClick from '/animations/articleClick.js'
 import gradientHeight from '/animations/gradientHeight.js'
 import textIn from '/animations/textIn.js'
+import navOpen from '/animations/navOpen.js'
+
 
 
 class App {
@@ -200,6 +202,7 @@ const onReady = async () => {
     titleFadeIn()
     articleClick()
     textIn()
+    navOpen()
 
     let GPUTier = await getGPUTier()
 
