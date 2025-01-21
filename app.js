@@ -11,7 +11,6 @@ import animTimeline from './threejs/timeline.js'
 import contactTabClick from '/animations/contactTabClick.js'
 import formTab from '/animations/formTab.js'
 import preloaderAnime from '/animations/preloader.js'
-import smoothScroll from '/animations/smoothScroll.js'
 import btnHover from '/animations/btnHover.js'
 import titleFadeIn from '/animations/titleFadeIn.js'
 import articleClick from '/animations/articleClick.js'
@@ -195,7 +194,6 @@ const onReady = async () => {
     preloaderAnime()
     contactTabClick()
     formTab()
-    smoothScroll()
     btnHover()
     titleFadeIn()
     articleClick()
@@ -219,7 +217,7 @@ const onReady = async () => {
 if (document.readyState !== 'loading') {
     onReady()
 } else {
-    //window.addEventListener("load", onReady);
     document.addEventListener('DOMContentLoaded', onLoading)
+    //window.addEventListener('load', onReady)
     document.addEventListener('DOMContentLoaded', onReady)
 }
