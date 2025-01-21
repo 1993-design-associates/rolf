@@ -13,8 +13,11 @@ const textIn = () => {
             targets: el.querySelectorAll('span'),
             opacity: [0, 1],
             autoplay: false,
-            delay: anime.stagger(100, { start: 500,  duration: 2000 }),
-            easing: 'easeOutQuad',
+            delay: (el, i) => 500 + 30 * i,
+            duration: 4000,
+
+            //delay: anime.stagger(100, { start: 500,  duration: 2000 }),
+            easing: 'easeInSine',
         });
 
         // Track if animation has been played
@@ -23,12 +26,11 @@ const textIn = () => {
         // Add scroll listener for this element
         const onScroll = () => {
             const rect = el.getBoundingClientRect();
-            const startTrigger = window.innerHeight * 0.25; // 75% of viewport height
-            const endTrigger = window.innerHeight * 0.85; // 25% of viewport height
+            const startTrigger = window.innerHeight * 0.85; // 75% of viewport height
+            const endTrigger = window.innerHeight * 0.6; // 25% of viewport height
 
-            // Calculate normalized scroll percent (0 to 1)
             const scrollPercent = Math.min(
-                Math.max((rect.top - endTrigger) / (startTrigger - endTrigger), 0),
+                Math.max((rect.top - startTrigger) / (endTrigger- startTrigger), 0),
                 1
             );
 
