@@ -202,9 +202,7 @@ const onReady = async () => {
 
     let GPUTier = await getGPUTier()
 
-    //GPUTier.tier = 0
-
-    if (GPUTier.tier > 0 && !GPUTier.tier.isMobile) {
+    if (GPUTier.tier > 0 && !GPUTier.isMobile) {
         // create curtains instance
         const app = new App(GPUTier)
         app.init()
