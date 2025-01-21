@@ -210,9 +210,10 @@ const onReady = async () => {
         // create curtains instance
         const app = new App(GPUTier)
         app.init()
-    } else {
-        //scrollToId()
     }
+    //else {
+    //scrollToId()
+    //}
 }
 
 if (document.readyState !== 'loading') {
