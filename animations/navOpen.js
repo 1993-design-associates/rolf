@@ -4,20 +4,26 @@ const navOpen = () => {
     const navItems = document.querySelectorAll('.nav-item');
     const burgerMenu = document.querySelector('.burger-menu');
 
+    // Ensure elements exist
+    if (!burgerMenu || navItems.length === 0) {
+        console.error("Required elements not found in the DOM.");
+        return;
+    }
+
     // Add click event listener to the burger menu
     burgerMenu.addEventListener('click', () => {
-        // Use anime.js to animate the nav items
-        anime({
+        console.log("Burger menu clicked");
+
+       anime({
             targets: navItems,
-            opacity: [0, 1], // Fade in effect
-            translateY: [-20, 0], // Slide in from above
-            delay: anime.stagger(100, { start: 900}),
-            easing: 'easeOutQuad', // Easing for a smooth animation
-            duration: 1500, // Duration of each animation
+            opacity: [0, 1],
+            delay: anime.stagger(100, { start: 500 }), // Staggering delay
+            duration: 2000, // Animation duration
+            easing: 'easeOutQuad',
         });
-        console.log("nav-click");
+
+    
     });
 };
 
-// Call the function to initialize the functionality
 export default navOpen;

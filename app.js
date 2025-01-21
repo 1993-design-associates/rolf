@@ -19,8 +19,6 @@ import gradientHeight from '/animations/gradientHeight.js'
 import textIn from '/animations/textIn.js'
 import navOpen from '/animations/navOpen.js'
 
-
-
 class App {
     constructor(tier) {
         this.timeline = new animTimeline()
