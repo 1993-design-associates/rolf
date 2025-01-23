@@ -21,7 +21,7 @@ const btnHover = () => {
 
             button.addEventListener('mouseenter', () => {
                 animateLetters(btnRel.querySelectorAll('.letter'), '0%', '-100%');
-                animateLetters(btnAbs.querySelectorAll('.letter'), '0%', '-100%');
+                animateLetters(btnAbs.querySelectorAll('.letter'), '110%', '0%');
             });
 
             button.addEventListener('mouseleave', () => {
