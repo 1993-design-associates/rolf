@@ -2,7 +2,11 @@ import anime from 'animejs'
 import smoothScroll from './smoothScroll'
 
 const homeHeroTextIn = () => {
-    const textElement = document.querySelector('.h1')
+    const textElement = document.querySelector('.h1');
+
+    // Get the data-direction value or default to 'center' if not specified
+    const direction = textElement.dataset.direction || 'center';
+    const speed = textElement.dataset.speed || '1500';
 
     // Split text into letters with spaces as spans
     textElement.innerHTML = [...textElement.textContent]
@@ -12,7 +16,7 @@ const homeHeroTextIn = () => {
                     letter === ' ' ? 'space' : ''
                 }">${letter}</span>`
         )
-        .join('')
+        .join('');
 
     // Animate each letter
     anime.timeline({ autoplay: true }).add({
@@ -20,11 +24,12 @@ const homeHeroTextIn = () => {
         translateY: [-25, 0],
         opacity: [0, 1],
         filter: ['blur(10px)', 'blur(0px)'],
-        duration: 1500,
+        duration: speed,
         easing: 'easeOutCubic',
-        delay: anime.stagger(100, { start: 900, from: 'center' }),
-    })
-}
+        delay: anime.stagger(100, { start: 900, from: direction }), // Use the direction value
+    });
+};
+
 
 const preloaderAnime = () => {
     //disable page scrolling until the preloader and hero text animation finishes
