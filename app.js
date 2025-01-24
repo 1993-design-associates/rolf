@@ -17,6 +17,9 @@ import articleClick from '/animations/articleClick.js'
 import gradientHeight from '/animations/gradientHeight.js'
 import textIn from '/animations/textIn.js'
 import burgerMenuOpen from '/animations/burgerMenuOpen.js'
+import activeFilter from '/animations/activeFilter.js'
+
+
 
 class App {
     constructor(tier) {
@@ -199,6 +202,7 @@ const onReady = async () => {
     articleClick()
     textIn()
     burgerMenuOpen()
+    activeFilter()
 
     let GPUTier = await getGPUTier()
 
