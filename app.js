@@ -188,6 +188,7 @@ class App {
 
 const onLoading = () => {
     gradientHeight()
+
 }
 
 const onReady = async () => {
@@ -200,6 +201,11 @@ const onReady = async () => {
     textIn()
     burgerMenuOpen()
 
+    
+    // Update the height on window resize
+    window.addEventListener('resize', gradientHeight);
+
+    
     let GPUTier = await getGPUTier()
 
     if (GPUTier.tier > 0 && !GPUTier.isMobile) {
