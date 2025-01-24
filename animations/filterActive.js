@@ -1,4 +1,4 @@
-const activeFilter = () => {
+const filterActive = () => {
     // Check if the window width is above 767px (tablet breakpoint)
     if (window.innerWidth > 767) {
 
@@ -8,6 +8,7 @@ const activeFilter = () => {
             filters[0].classList.add("active");
         }
         console.log("filter");
+        
         filters.forEach(filter => {
             filters.addEventListener("click", () => {
                 // Remove "active" class from all .filter-btn elements
@@ -22,4 +23,4 @@ const activeFilter = () => {
     }
 };
 
-export default activeFilter;
+export default filterActive;
