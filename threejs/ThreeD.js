@@ -5,6 +5,7 @@ import Sphere from './sphere'
 import { sphereMaterial } from './sphereMat.js'
 import { smlSphereMat } from './smlSphereMat.js'
 
+import GUI from 'lil-gui'
 import Stats from 'stats.js'
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
@@ -14,18 +15,40 @@ function sRGBToLinear(hex) {
     return c
 }
 
+const COLORS = {
+    color1: '#2F3720',
+    color2: '#F0C464',
+    color3: '#FCF6E1',
+    color4: '#C38B38',
+}
+
+//TBC remove this code
+const LOCAL_STORAGE_KEY = 'guiSphere'
+
+// Initialize the numberOfSmallSpheres to store the value
+const numberOfSmallSpheres = {
+    number: 9, // Default value
+}
+
+// Check if the value is already stored in localStorage
+if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
+    numberOfSmallSpheres.number = parseFloat(
+        localStorage.getItem(LOCAL_STORAGE_KEY)
+    )
+}
+
 class ThreeD {
     constructor(pixelRatio, tier, app) {
         //lets set up our three.js scene
 
         this.frames = []
         this.pixelRatio = pixelRatio
-        this.numSmallSpheres = tier.tier > 2 ? 12 : 6
+        this.numSmallSpheres = tier.tier > 2 ? numberOfSmallSpheres.number : 6
 
-        this.colDark = sRGBToLinear('#2F3720')
-        this.colMid = sRGBToLinear('#F0C464')
-        this.colLight = sRGBToLinear('#FCF6E1')
-        this.colGlow = sRGBToLinear('#C38B38')
+        this.colDark = sRGBToLinear(COLORS.color1) //Dark
+        this.colMid = sRGBToLinear(COLORS.color2) //Light Gold
+        this.colLight = sRGBToLinear(COLORS.color3) //Cream
+        this.colGlow = sRGBToLinear(COLORS.color4) //Darker Gold
 
         this.app = app
         this.height = window.innerHeight
@@ -136,7 +159,7 @@ class ThreeD {
             this.colMid,
             this.colLight,
             this.colGlow,
-            this.sphereRad,
+            3,
             THREE.BackSide,
             this.numSmallSpheres
         )
@@ -256,11 +279,7 @@ class ThreeD {
     }
 
     init() {
-        // TBC - Stats
-        this.stats = new Stats()
-        this.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-        this.stats.dom.classList.add('stats')
-        document.body.appendChild(this.stats.dom)
+        this.initStatAndGUI()
 
         this.renderer.render(this.scene, this.camera)
         this.metaballs.material = this.backMat
@@ -484,6 +503,72 @@ class ThreeD {
             20 - axes.transition * 10,
             0.09
         )
+    }
+
+    updateRadius(val) {
+        this.geo.dispose()
+        this.metaballs.geometry = new THREE.IcosahedronGeometry(val, 32)
+    }
+
+    updateColor(val, color = 'colDark') {
+        this.frontMat.userData.shader.uniforms[color].value.setRGB(
+            val.r,
+            val.g,
+            val.b
+        )
+        this.backMat.userData.shader.uniforms[color].value.setRGB(
+            val.r,
+            val.g,
+            val.b
+        )
+    }
+
+    initStatAndGUI() {
+        // TBC - Stats
+        this.stats = new Stats()
+        this.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+        this.stats.dom.classList.add('stats')
+        document.body.appendChild(this.stats.dom)
+
+        this.gui = new GUI()
+
+        const colorLayers = {
+            front: {
+                color1: 'colDark',
+                color2: 'colMid',
+                color3: 'colLight',
+                color4: 'colGlow',
+            },
+            back: {
+                color1: 'colDark',
+                color2: 'colMid',
+                color3: 'colLight',
+                color4: 'colGlow',
+            },
+        }
+
+        Object.keys(colorLayers).forEach((layer) => {
+            const a = this.gui.addFolder(layer)
+            const innerObject = colorLayers[layer]
+
+            Object.entries(innerObject).forEach(([color, colorName]) => {
+                a.addColor(COLORS, color.toString()).onChange((value) => {
+                    this.updateColor(sRGBToLinear(value), colorName)
+                })
+            })
+        })
+
+        this.obj = { radius: 1.8 }
+        this.gui.add(this.obj, 'radius', 1, 3, 0.01).onChange((value) => {
+            this.updateRadius(value)
+        })
+
+        this.gui
+            .add(numberOfSmallSpheres, 'number', 4, 20, 1)
+            .onChange((newValue) => {
+                // When the value changes, store it in localStorage
+                localStorage.setItem(LOCAL_STORAGE_KEY, newValue)
+            })
     }
 
     animate() {

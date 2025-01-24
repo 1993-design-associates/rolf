@@ -42,6 +42,7 @@
         "@parcel/transformer-glsl": "^2.13.3",
         "@parcel/transformer-raw": "^2.13.3",
         "buffer": "^6.0.3",
-        "eslint": "^9.17.0"
+        "eslint": "^9.17.0",
+        "lil-gui": "^0.20.0"
     }
 }
