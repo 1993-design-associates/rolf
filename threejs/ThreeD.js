@@ -254,8 +254,8 @@ class ThreeD {
             y,
             -1,
             1,
-            THREE.MathUtils.degToRad(-5),
-            THREE.MathUtils.degToRad(15)
+            THREE.MathUtils.degToRad(12.5),
+            THREE.MathUtils.degToRad(22.5)
         )
         this.mouse = this.screenToPos(x, y)
         if (isNaN(this.mouse.x) || isNaN(this.mouse.y) || isNaN(this.mouse.z)) {
@@ -332,7 +332,7 @@ class ThreeD {
             this.smallSpheres.forEach((sphere, index) => {
                 sphere.boundaryRadius = THREE.MathUtils.lerp(
                     sphere.boundaryRadius,
-                    mapClamp(Math.pow(cStep, 3), 0, 1, 1, 3),
+                    mapClamp(Math.pow(cStep, 3), 0, 1, 1, 4.5),
                     0.01
                 )
                 sphere.update(axes, this.camera)
@@ -436,7 +436,7 @@ class ThreeD {
             this.metaballs.material.userData.shader.uniforms.minOpacity.value = 1
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colGlow
-            this.metaballs.material.userData.shader.uniforms.offset.value = 0.03
+            this.metaballs.material.userData.shader.uniforms.offset.value = 0.1
             this.frontMat.userData.shader.uniforms.inOpacity.value = 1.0
 
             this.renderer.autoClear = false

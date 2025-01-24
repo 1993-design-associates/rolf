@@ -166,21 +166,21 @@ class Sphere {
             camera
         )
         // Clamp the target position to the visible area of the camera at the distance of the sphere from the camera
-        targetPos.x = clamp(
-            targetPos.x,
-            visibleArea.minX + this.radius,
-            visibleArea.maxX - this.radius
-        )
-        targetPos.y = clamp(
-            targetPos.y,
-            visibleArea.minY + this.radius,
-            visibleArea.maxY - this.radius
-        )
-        targetPos.z = clamp(
-            targetPos.y,
-            -camera.position.z + this.radius,
-            camera.position.z - this.radius
-        )
+        // targetPos.x = clamp(
+        //     targetPos.x,
+        //     visibleArea.minX + this.radius,
+        //     visibleArea.maxX - this.radius
+        // )
+        // targetPos.y = clamp(
+        //     targetPos.y,
+        //     visibleArea.minY + this.radius,
+        //     visibleArea.maxY - this.radius
+        // )
+        // targetPos.z = clamp(
+        //     targetPos.y,
+        //     -camera.position.z + this.radius,
+        //     camera.position.z - this.radius
+        // )
 
         // Calculate the distance to the target position
         let distanceToTarget = pos.distanceTo(targetPos)
@@ -194,7 +194,7 @@ class Sphere {
             .multiplyScalar(forceMagnitude) // Adjust the force magnitude as needed
         // Calculate the tangential force for circular motion around the z-axis
         let zAxis = new THREE.Vector3(0, 1, 0.2)
-        let orbitSpeed = 2.5 // Adjust the orbit speed as needed
+        let orbitSpeed = 1.0 // Adjust the orbit speed as needed
         let tangentialForce = new THREE.Vector3()
             .crossVectors(dir, zAxis)
             .normalize()

@@ -14,8 +14,20 @@
     
 
  
-    fresnelSub = pow(smoothstep(0.0, 0.9, fresnelSub), clamp( min(((outgoingLightMax)*(1.0-minOpacity)), 1.0-pow(vProximity, 1.0)) * 16.0, 2.0, 16.0)); // Adjust the power as needed
-    fresnel = pow(smoothstep(0.0, 0.7, fresnel), 2.0); // Adjust the power as neede
+   // Calculate the smoothstep value for fresnelSub
+    float fresnelSmoothStep = smoothstep(0.0, 0.9, fresnelSub);
+
+    // Calculate the min value for fresnelSub
+    float fresnelByLight = outgoingLightMax * (1.0 - minOpacity);
+
+    // Clamp the scaled min value between 4.0 and 20.0 for fresnelSub
+    float fresnelClampedPow = clamp(fresnelByLight * 16.0, 4.0, 20.0);
+    float fresnelByProx = mix(fresnelClampedPow, 2.0, smoothstep(0.0, 0.7, vProximity));
+    // Calculate the final fresnelSub value using pow
+    fresnelSub = pow(fresnelSmoothStep, fresnelByProx);
+
+
+    fresnel = pow(smoothstep(0.0, 0.7, fresnel), 4.0); // Adjust the power as neede
     
     float finalFresnel = (fresnel - fresnelSub);
 
@@ -42,7 +54,8 @@
 
  
 
-    vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(1.0, 0.0, outgoingLightMax), 1.0));
+    vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(1.0, 0.0, outgoingLightMax), 1.25));
+    glowColor = mix(glowColor, colGlow, pow(fresnelSub, 2.0));
     //minColor = mix(minColor, glowColor, fresnelSub);
     float scaleFactor = vProximity;
     float maxFade = clamp(scaleFactor, 0.0, 1.0 );
