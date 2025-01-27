@@ -18,7 +18,7 @@ function sRGBToLinear(hex) {
 const COLORS = {
     color1: '#999056',
     color2: '#ffcd61',
-    color3: '#FCF6E1',
+    color3: '#fffdf5',
     color4: '#db9d29',
 }
 
@@ -132,7 +132,7 @@ class ThreeD {
         // this.domEl.style.position = '-webkit-sticky'
         // this.domEl.style.top = 0
 
-        this.lightTop = new THREE.RectAreaLight(0xffcd61, 2, 35, 20)//was 0xffffff, 2, 25, 25
+        this.lightTop = new THREE.RectAreaLight(0xffffff, 2, 35, 20)//was 0xffffff, 2, 25, 25
         this.lightTop.lookAt(0, 0, 0)
         this.lightBack = new THREE.PointLight(0xfffefa, 10000)
         this.lightGroup.add(this.lightTop)
