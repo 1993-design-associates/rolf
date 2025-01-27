@@ -16,10 +16,10 @@ function sRGBToLinear(hex) {
 }
 
 const COLORS = {
-    color1: '#2F3720',
-    color2: '#F0C464',
+    color1: '#999056',
+    color2: '#ffcd61',
     color3: '#FCF6E1',
-    color4: '#C38B38',
+    color4: '#db9d29',
 }
 
 //TBC remove this code
@@ -132,9 +132,9 @@ class ThreeD {
         // this.domEl.style.position = '-webkit-sticky'
         // this.domEl.style.top = 0
 
-        this.lightTop = new THREE.RectAreaLight(0xffffff, 2.0, 25, 25)
+        this.lightTop = new THREE.RectAreaLight(0xffcd61, 2, 35, 20)//was 0xffffff, 2, 25, 25
         this.lightTop.lookAt(0, 0, 0)
-        this.lightBack = new THREE.PointLight(0xffffff, 10000)
+        this.lightBack = new THREE.PointLight(0xfffefa, 10000)
         this.lightGroup.add(this.lightTop)
         //this.lightGroup.add(this.lightBack)
         this.lightTop.position.set(0, -20, 40)
@@ -142,9 +142,9 @@ class ThreeD {
         // Add lighting
         const width = 40
         const height = 40
-        const intensity = 3.5
+        const intensity = 3.8//was 3.5
         const light = new THREE.RectAreaLight(
-            0xffffff,
+            0xfffefa,
             intensity,
             width,
             height
@@ -211,7 +211,7 @@ class ThreeD {
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let size = getRandomNumber(0.8, 1.8)
-                    let density = mapClamp(size, 0.45, 1, 5, 2)
+                    let density = mapClamp(size, 0.45, 1, 2.5, 2)//was (size, 0.45, 1, 5, 2
                     let sphere = new Sphere(
                         size * this.smallSphereRadius,
                         smlSphereMat(
@@ -247,8 +247,8 @@ class ThreeD {
             x,
             -1,
             1,
-            THREE.MathUtils.degToRad(-45),
-            THREE.MathUtils.degToRad(45)
+            THREE.MathUtils.degToRad(-15),//was -45
+            THREE.MathUtils.degToRad(15)//was 45
         )
         this.lightRot.x = -mapClamp(
             y,

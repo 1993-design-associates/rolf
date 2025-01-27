@@ -54,7 +54,7 @@
 
  
 
-    vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(1.0, 0.0, outgoingLightMax), 1.25));
+    vec3 glowColor = mix(colGlow, colLight, pow(smoothstep(5.0, 0.0, outgoingLightMax), 1.25));//was 1.1, 0.0, 1.25
     glowColor = mix(glowColor, colGlow, pow(fresnelSub, 2.0));
     //minColor = mix(minColor, glowColor, fresnelSub);
     float scaleFactor = vProximity;

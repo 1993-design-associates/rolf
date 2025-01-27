@@ -22,7 +22,7 @@ class Sphere {
         this.position = position
         this.density = density
         this.boundaryRadius = boundaryRadius
-        this.damping = 10
+        this.damping = 5// was 10
         this.maxDamping = 200
 
         const Geo = new THREE.IcosahedronGeometry(this.radius, 6)
@@ -87,7 +87,7 @@ class Sphere {
         anime({
             targets: this.axes,
             opacity: [0.0, this.opacity],
-            fres: [this.fresnelScale * 1.1, this.fresnelScale * 0.2],
+            fres: [this.fresnelScale * 1.5, this.fresnelScale * 0.2],
             maxOpacity: [0.8, 1.0],
             inOpacity: [0.5, 1.0],
             duration: getRandomNumber(24000, 12000),
@@ -121,7 +121,7 @@ class Sphere {
         )
 
         // Calculate the target position based on axes.step
-        let targetDistance = clamp(axes.step * 1.5, 0.5, 4.5) // Adjust this value as needed
+        let targetDistance = clamp(axes.step * 1.8, 0.5, 4.5) // Adjust this value as needed
 
         this.distancefromOrigin = pos.distanceTo(this.parent.position * 1.5)
         //console.log(this.opacity * axes.opacity)
