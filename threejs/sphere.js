@@ -22,7 +22,7 @@ class Sphere {
         this.position = position
         this.density = density
         this.boundaryRadius = boundaryRadius
-        this.damping = 5// was 10
+        this.damping = 10
         this.maxDamping = 200
 
         const Geo = new THREE.IcosahedronGeometry(this.radius, 6)
@@ -89,7 +89,7 @@ class Sphere {
             opacity: [0.0, this.opacity],
             fres: [this.fresnelScale * 1.5, this.fresnelScale * 0.2],
             maxOpacity: [0.8, 1.0],
-            inOpacity: [0.5, 1.0],
+            inOpacity: [0.75, 1.0],
             duration: getRandomNumber(24000, 12000),
             easing: 'easeInOutSine',
             loop: true,

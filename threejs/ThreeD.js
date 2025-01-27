@@ -27,7 +27,7 @@ const LOCAL_STORAGE_KEY = 'guiSphere'
 
 // Initialize the numberOfSmallSpheres to store the value
 const numberOfSmallSpheres = {
-    number: 9, // Default value
+    number: 10, // Default value
 }
 
 // Check if the value is already stored in localStorage
@@ -211,7 +211,7 @@ class ThreeD {
                     let y = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let z = getRandomNumber(-this.orbitRadius, this.orbitRadius)
                     let size = getRandomNumber(0.8, 1.8)
-                    let density = mapClamp(size, 0.45, 1, 2.5, 2)//was (size, 0.45, 1, 5, 2
+                    let density = mapClamp(size, 0.45, 1, 5, 2)
                     let sphere = new Sphere(
                         size * this.smallSphereRadius,
                         smlSphereMat(
