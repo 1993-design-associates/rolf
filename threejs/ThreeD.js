@@ -528,10 +528,10 @@ class ThreeD {
         this.stats = new Stats()
         this.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
         this.stats.dom.classList.add('stats')
-        document.body.appendChild(this.stats.dom)
+        //document.body.appendChild(this.stats.dom)
 
         this.gui = new GUI()
-
+        this.gui.domElement.style.display = 'none'
         const colorLayers = {
             front: {
                 color1: 'colDark',
