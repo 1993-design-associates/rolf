@@ -188,7 +188,53 @@ class App {
 
 const onLoading = () => {
     gradientHeight()
+}
 
+function isIpad() {
+    return (
+        /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document
+    )
+}
+
+function detectIPadModel() {
+    const ua = navigator.userAgent
+
+    if (ua.includes('iPad')) {
+        if (window.devicePixelRatio === 2 && screen.width === 820) {
+            return 'iPad Air'
+        } else if (window.devicePixelRatio === 2 && screen.width === 834) {
+            return 'iPad Pro 11-inch'
+        } else if (window.devicePixelRatio === 2 && screen.width === 1024) {
+            return 'iPad Pro 12.9-inch'
+        }
+    }
+    return 'Unknown iPad'
+}
+
+async function createTopLeftDomElement() {
+    // Detect the iPad model
+    const modelText = await detectIPadModel()
+
+    // Create a new DOM element
+    const element = document.createElement('div')
+    element.textContent = `Detected Device: ${modelText}`
+
+    // Style the element
+    Object.assign(element.style, {
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '8px',
+        zIndex: 1000,
+        fontSize: '14px',
+        fontFamily: 'Arial, sans-serif',
+    })
+
+    // Append the element to the body
+    document.body.appendChild(element)
 }
 
 const onReady = async () => {
@@ -201,21 +247,26 @@ const onReady = async () => {
     textIn()
     burgerMenuOpen()
 
-
     // Update the height on window resize
-    window.addEventListener('resize', gradientHeight);
+    window.addEventListener('resize', gradientHeight)
 
-    // when clicks on "View All", it goes back to the previous page 
-    const backBtn = document.querySelector('.back-btn');
+    // when clicks on "View All", it goes back to the previous page
+    const backBtn = document.querySelector('.back-btn')
     if (backBtn) {
         backBtn.addEventListener('click', () => {
-            history.back();
-        });
+            history.back()
+        })
     }
 
     let GPUTier = await getGPUTier()
-
-    if (GPUTier.tier > 0 && !GPUTier.isMobile) {
+    // console.log(GPUTier)
+    // console.log(isIpad())
+    // console.log(detectIPadModel())
+    createTopLeftDomElement()
+    if (
+        (GPUTier.tier > 0 && !GPUTier.isMobile) ||
+        (GPUTier.tier > 2 && isIpad())
+    ) {
         // create curtains instance
         const app = new App(GPUTier)
         app.init()

@@ -132,7 +132,7 @@ class ThreeD {
         // this.domEl.style.position = '-webkit-sticky'
         // this.domEl.style.top = 0
 
-        this.lightTop = new THREE.RectAreaLight(0xffffff, 2, 35, 20)//was 0xffffff, 2, 25, 25
+        this.lightTop = new THREE.RectAreaLight(0xffffff, 2, 35, 20) //was 0xffffff, 2, 25, 25
         this.lightTop.lookAt(0, 0, 0)
         this.lightBack = new THREE.PointLight(0xfffefa, 10000)
         this.lightGroup.add(this.lightTop)
@@ -142,7 +142,7 @@ class ThreeD {
         // Add lighting
         const width = 40
         const height = 40
-        const intensity = 3.8//was 3.5
+        const intensity = 3.8 //was 3.5
         const light = new THREE.RectAreaLight(
             0xfffefa,
             intensity,
@@ -247,8 +247,8 @@ class ThreeD {
             x,
             -1,
             1,
-            THREE.MathUtils.degToRad(-15),//was -45
-            THREE.MathUtils.degToRad(15)//was 45
+            THREE.MathUtils.degToRad(-15), //was -45
+            THREE.MathUtils.degToRad(15) //was 45
         )
         this.lightRot.x = -mapClamp(
             y,
@@ -279,7 +279,7 @@ class ThreeD {
     }
 
     init() {
-        this.initStatAndGUI()
+        //this.initStatAndGUI()
 
         this.renderer.render(this.scene, this.camera)
         this.metaballs.material = this.backMat
@@ -528,7 +528,7 @@ class ThreeD {
         this.stats = new Stats()
         this.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
         this.stats.dom.classList.add('stats')
-        //document.body.appendChild(this.stats.dom)
+        document.body.appendChild(this.stats.dom)
 
         this.gui = new GUI()
         this.gui.domElement.style.display = 'none'
@@ -572,9 +572,9 @@ class ThreeD {
     }
 
     animate() {
-        // TBC - Stats
         this.getDelta()
-        this.stats.begin()
+        // TBC - Stats
+        //this.stats.begin()
 
         let axes = this.app.getTimelineValues()
 
@@ -585,7 +585,7 @@ class ThreeD {
             this.render()
         }
         // TBC - Stats
-        this.stats.end()
+        //this.stats.end()
 
         requestAnimationFrame(this.animate.bind(this))
     }
