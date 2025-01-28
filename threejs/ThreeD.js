@@ -55,7 +55,7 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            32,
+            tier.isMobile ? 55 : 32,
             this.width / this.height,
             0.1,
             1000
