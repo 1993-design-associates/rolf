@@ -15,7 +15,6 @@ import preloaderAnime from '/animations/preloader.js'
 import btnHover from '/animations/btnHover.js'
 import titleFadeIn from '/animations/titleFadeIn.js'
 import articleClick from '/animations/articleClick.js'
-import gradientHeight from '/animations/gradientHeight.js'
 import textIn from '/animations/textIn.js'
 import burgerMenuOpen from '/animations/burgerMenuOpen.js'
 
@@ -188,7 +187,7 @@ class App {
 }
 
 const onLoading = () => {
-    gradientHeight()
+
 }
 
 async function createTopLeftDomElement(gpuTier, isMobile) {
