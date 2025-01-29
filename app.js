@@ -191,6 +191,32 @@ const onLoading = () => {
     gradientHeight()
 }
 
+async function createTopLeftDomElement() {
+    // Detect the iPad model
+    const modelText = await isIpadPro()
+
+    // Create a new DOM element
+    const element = document.createElement('div')
+    element.textContent = `Is Ipad Pro: ${modelText}`
+
+    // Style the element
+    Object.assign(element.style, {
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '8px',
+        zIndex: 1000,
+        fontSize: '14px',
+        fontFamily: 'Arial, sans-serif',
+    })
+
+    // Append the element to the body
+    document.body.appendChild(element)
+}
+
 function isIpadPro() {
     return (
         /iPad|Macintosh/.test(navigator.userAgent) &&
@@ -220,10 +246,10 @@ const onReady = async () => {
         })
     }
 
+    createTopLeftDomElement()
+
     let GPUTier = await getGPUTier()
-    // console.log(GPUTier)
-    // console.log(isIpad())
-    // console.log(detectIPadModel())
+
     if (
         (GPUTier.tier > 0 && !GPUTier.isMobile) ||
         (GPUTier.tier > 2 && isIpadPro())
