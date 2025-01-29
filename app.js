@@ -1,5 +1,6 @@
 //https://github.com/martinlaxenaire/curtainsjs/blob/master/examples/multiple-textures/js/multiple.textures.setup.js
 const parceled = true
+import './styles/app.css'
 import { getGPUTier } from 'detect-gpu'
 
 import anime from 'animejs/lib/anime.es.js'
