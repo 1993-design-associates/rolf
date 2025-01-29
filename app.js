@@ -246,14 +246,13 @@ const onReady = async () => {
         })
     }
 
-    createTopLeftDomElement()
-
     let GPUTier = await getGPUTier()
 
     if (
         (GPUTier.tier > 0 && !GPUTier.isMobile) ||
         (GPUTier.tier > 2 && isIpadPro())
     ) {
+        createTopLeftDomElement()
         // create curtains instance
         const app = new App(GPUTier)
         app.init()
