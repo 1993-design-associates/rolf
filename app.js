@@ -186,43 +186,41 @@ class App {
     }
 }
 
-const onLoading = () => {
+// const onLoading = () => {}
 
-}
+// async function createTopLeftDomElement(gpuTier, isMobile) {
+//     // Detect the iPad model
+//     const modelText = await isIpadPro()
 
-async function createTopLeftDomElement(gpuTier, isMobile) {
-    // Detect the iPad model
-    const modelText = await isIpadPro()
+//     // Create a new DOM element
+//     const element = document.createElement('div')
+//     element.innerHTML = `GpuTier: ${gpuTier} <br/> Is Mobile: ${isMobile} <br/> Is Ipad Pro: ${modelText}`
 
-    // Create a new DOM element
-    const element = document.createElement('div')
-    element.innerHTML = `GpuTier: ${gpuTier} <br/> Is Mobile: ${isMobile} <br/> Is Ipad Pro: ${modelText}`
+//     // Style the element
+//     Object.assign(element.style, {
+//         position: 'fixed',
+//         top: '10px',
+//         left: '10px',
+//         backgroundColor: 'rgba(0, 0, 0, 0.7)',
+//         color: 'white',
+//         padding: '10px',
+//         borderRadius: '8px',
+//         zIndex: 1000,
+//         fontSize: '14px',
+//         fontFamily: 'Arial, sans-serif',
+//     })
 
-    // Style the element
-    Object.assign(element.style, {
-        position: 'fixed',
-        top: '10px',
-        left: '10px',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        color: 'white',
-        padding: '10px',
-        borderRadius: '8px',
-        zIndex: 1000,
-        fontSize: '14px',
-        fontFamily: 'Arial, sans-serif',
-    })
+//     // Append the element to the body
+//     document.body.appendChild(element)
+// }
 
-    // Append the element to the body
-    document.body.appendChild(element)
-}
-
-function isIpadPro() {
-    return (
-        /iPad|Macintosh/.test(navigator.userAgent) &&
-        'ontouchend' in document &&
-        screen.width >= 991
-    )
-}
+// function isIpadPro() {
+//     return (
+//         /iPad|Macintosh/.test(navigator.userAgent) &&
+//         'ontouchend' in document &&
+//         screen.width >= 991
+//     )
+// }
 
 const onReady = async () => {
     preloaderAnime()
@@ -243,17 +241,21 @@ const onReady = async () => {
     }
 
     let GPUTier = await getGPUTier()
-    createTopLeftDomElement(GPUTier.tier, GPUTier.isMobile)
-    if (
-        (GPUTier.tier > 0 && !GPUTier.isMobile) ||
-        (GPUTier.tier > 2 && isIpadPro())
-    ) {
-        // create curtains instance
-        const app = new App(GPUTier)
-        app.init()
-    } else {
-        console.log("You've a ** machine. Upgrade now")
-    }
+
+    // Turns on canvas for all devices
+    const app = new App(GPUTier)
+    app.init()
+
+    // Turns on canvas only for desktop & ipad pro
+    // if (
+    //     (GPUTier.tier > 0 && !GPUTier.isMobile) || isIpadPro())
+    // ) {
+    //     // create curtains instance
+    //     const app = new App(GPUTier)
+    //     app.init()
+    // } else {
+    //     console.log("You've a ** machine. Upgrade now")
+    // }
 }
 
 if (document.readyState !== 'loading') {
