@@ -191,13 +191,13 @@ const onLoading = () => {
     gradientHeight()
 }
 
-async function createTopLeftDomElement() {
+async function createTopLeftDomElement(gpuTier, isMobile) {
     // Detect the iPad model
     const modelText = await isIpadPro()
 
     // Create a new DOM element
     const element = document.createElement('div')
-    element.textContent = `Is Ipad Pro: ${modelText}`
+    element.innerHTML = `GpuTier: ${gpuTier} <br/> Is Mobile: ${isMobile} <br/> Is Ipad Pro: ${modelText}`
 
     // Style the element
     Object.assign(element.style, {
@@ -247,12 +247,11 @@ const onReady = async () => {
     }
 
     let GPUTier = await getGPUTier()
-
+    createTopLeftDomElement(GPUTier.tier, GPUTier.isMobile)
     if (
         (GPUTier.tier > 0 && !GPUTier.isMobile) ||
         (GPUTier.tier > 2 && isIpadPro())
     ) {
-        createTopLeftDomElement()
         // create curtains instance
         const app = new App(GPUTier)
         app.init()
