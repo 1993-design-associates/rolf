@@ -234,9 +234,6 @@ const onReady = async () => {
     textIn()
     burgerMenuOpen()
 
-    // Update the height on window resize
-    window.addEventListener('resize', gradientHeight)
-
     // when clicks on "View All", it goes back to the previous page
     const backBtn = document.querySelector('.back-btn')
     if (backBtn) {
