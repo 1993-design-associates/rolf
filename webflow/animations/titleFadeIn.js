@@ -3,9 +3,14 @@ import anime from "animejs";
 const titleFadeIn = () => {
     document.querySelectorAll('.title-fade').forEach(el => {
 
-        // Break text into spans
-        el.innerHTML = [...el.textContent]
-            .map(char => `<span${char === ' ' ? ' class="space"' : ''} style="opacity: 0;">${char}</span>`)
+        // Break text into spans but keep words intact
+        el.innerHTML = el.textContent
+            .split(/(\s+)/) // Split by spaces, preserving them
+            .map(word =>
+                word.trim()
+                    ? `<span class="word">${[...word].map(char => `<span style="opacity: 0;">${char}</span>`).join('')}</span>`
+                    : `<span class="space">${word}</span>` // Keep spaces separate
+            )
             .join('');
 
         // Create an animation for the spans

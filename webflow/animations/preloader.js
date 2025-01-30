@@ -8,19 +8,21 @@ const homeHeroTextIn = () => {
     const direction = textElement.dataset.direction || 'center';
     const speed = textElement.dataset.speed || '1500';
 
-    // Split text into letters with spaces as spans
-    textElement.innerHTML = [...textElement.textContent]
-        .map(
-            (letter) =>
-                `<span class="${
-                    letter === ' ' ? 'space' : ''
-                }">${letter}</span>`
-        )
-        .join('');
+    // Split text into words, wrap letters in spans, and keep spaces separate
+    textElement.innerHTML = textElement.textContent
+    .split(/\s+/) // Split into words
+    .map(word => 
+        `<span class="word">${[...word]
+            .map(letter => `<span class="letter">${letter}</span>`)
+            .join('')}</span>`)
+    .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
+
+
+
 
     // Animate each letter
     anime.timeline({ autoplay: true }).add({
-        targets: '.h1 span',
+        targets: '.h1 .letter',
         translateY: [-25, 0],
         opacity: [0, 1],
         filter: ['blur(10px)', 'blur(0px)'],
