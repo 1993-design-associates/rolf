@@ -6,17 +6,9 @@ import { getGPUTier } from 'detect-gpu'
 import anime from 'animejs/lib/anime.es.js'
 import _, { clamp } from 'lodash'
 import ThreeD from './threejs/ThreeD.js'
-import scrollToId from './threejs/scrollToId.js'
 import animTimeline from './threejs/timeline.js'
 
-import contactTabClick from '/animations/contactTabClick.js'
-import formTab from '/animations/formTab.js'
-import preloaderAnime from '/animations/preloader.js'
-import btnHover from '/animations/btnHover.js'
-import titleFadeIn from '/animations/titleFadeIn.js'
-import articleClick from '/animations/articleClick.js'
-import textIn from '/animations/textIn.js'
-import burgerMenuOpen from '/animations/burgerMenuOpen.js'
+import initWebflowFunctions from './webflow/main.js'
 
 class App {
     constructor(tier) {
@@ -54,7 +46,6 @@ class App {
         this.timeline.init(this.contHeight, this.height)
         this.onScroll()
         this.canvasContainer.style.height = `${this.height}px`
-        //this.canvasContainer.style.width = `100%`
         this.threeD.init()
         this.onLoaded()
     }
@@ -80,13 +71,6 @@ class App {
     }
 
     onLoaded() {
-        //this.container.style.height = '100%'
-        //this.container.style.overflow = 'hidden'
-
-        // this.stats = new Stats();
-        // this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
-        // this.stats.dom.classList.add('stats');
-        // document.body.appendChild( this.stats.dom );
         this.timeline.init(this.contHeight, this.height)
 
         let _mouse = _.throttle(this.mouseEvent.bind(this), 16, {
@@ -102,8 +86,6 @@ class App {
         document.addEventListener('mousemove', _mouse.bind(this), false)
         window.addEventListener('scroll', _scroll.bind(this), false)
 
-        //    this.threeD.setPos(this.origin)
-
         window.addEventListener('resize', () => {
             _resize()
         })
@@ -111,60 +93,9 @@ class App {
         window.visualViewport.addEventListener('resize', () => {
             _resize()
         })
-
-        // let observer = new ResizeObserver(() => {
-        //     _resize()
-        // })
-
-        //REMOVED stores location when changing pages
-        // window.addEventListener('popstate', (event) => {
-        //     this.storeScroll()
-        // })
-
-        // document.querySelectorAll('a').forEach((e) => {
-        //     e.addEventListener('mouseenter', ()=>{
-        //         this.impulses.morph = 1.5
-        //     })
-
-        //     e.addEventListener('mouseleave', () =>{
-        //         this.impulses.morph = 1
-        //     } )
-        // })
     }
 
-    // storeScroll() {
-    //     let slug = window.location.pathname
-    //     sessionStorage.setItem(`scroll-${slug}`, this.container.scrollTop)
-    // }
-
-    // monitorPerformance(delta) {
-    //     //this.frames[this.frames.length] = delta
-    //     this.frames.push(delta)
-    //     if (this.frames.length >= 45) {
-    //         let total = this.frames.reduce((acc, val) => acc + val)
-    //         if (total / 45 > 1 / 30 && this.pixelRatio > 0.8) {
-    //             let minus = total / 45 > 1 / 15 ? 0.15 : 0.1
-    //             this.pixelRatio = this.pixelRatio - minus
-    //             this.threeD.setPixelRatio(this.pixelRatio)
-    //         }
-
-    //         if (this.pixelRatio < 0.85 && this.hasText) {
-    //             this.removeText()
-    //         }
-
-    //         this.frames = []
-    //     }
-    // }
-
-    // getDelta() {
-    //     let delta = (performance.now() - this.lastFrame) / 1000
-    //     delta = delta > 1.0 ? 1.0 : delta
-    //     this.lastFrame = performance.now()
-    //     this.monitorPerformance(delta)
-    //     return delta
-    // }
-
-    onScroll(e) {
+    onScroll() {
         if (this.canScroll) {
             this.y = document.documentElement.scrollTop || window.scrollY
             this.y = clamp(this.y, 0, this.contHeight - this.height)
@@ -186,32 +117,6 @@ class App {
     }
 }
 
-// async function createTopLeftDomElement(gpuTier, isMobile) {
-//     // Detect the iPad model
-//     const modelText = await isIpadPro()
-
-//     // Create a new DOM element
-//     const element = document.createElement('div')
-//     element.innerHTML = `GpuTier: ${gpuTier} <br/> Is Mobile: ${isMobile} <br/> Is Ipad Pro: ${modelText}`
-
-//     // Style the element
-//     Object.assign(element.style, {
-//         position: 'fixed',
-//         top: '10px',
-//         left: '10px',
-//         backgroundColor: 'rgba(0, 0, 0, 0.7)',
-//         color: 'white',
-//         padding: '10px',
-//         borderRadius: '8px',
-//         zIndex: 1000,
-//         fontSize: '14px',
-//         fontFamily: 'Arial, sans-serif',
-//     })
-
-//     // Append the element to the body
-//     document.body.appendChild(element)
-// }
-
 // function isIpadPro() {
 //     return (
 //         /iPad|Macintosh/.test(navigator.userAgent) &&
@@ -221,22 +126,8 @@ class App {
 // }
 
 const onReady = async () => {
-    preloaderAnime()
-    contactTabClick()
-    formTab()
-    btnHover()
-    titleFadeIn()
-    articleClick()
-    textIn()
-    burgerMenuOpen()
-
-    // when clicks on "View All", it goes back to the previous page
-    const backBtn = document.querySelector('.back-btn')
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            history.back()
-        })
-    }
+    //Initialize all custom js functions used in webflow
+    initWebflowFunctions()
 
     let GPUTier = await getGPUTier()
 
@@ -259,7 +150,5 @@ const onReady = async () => {
 if (document.readyState !== 'loading') {
     onReady()
 } else {
-    //document.addEventListener('DOMContentLoaded', onLoading)
-    //window.addEventListener('load', onReady)
     document.addEventListener('DOMContentLoaded', onReady)
 }

@@ -1,5 +1,3 @@
-import parseColor from 'parse-color'
-
 const hexToRgb = (hex) =>
     hex
         .replace(

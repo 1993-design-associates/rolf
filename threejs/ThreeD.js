@@ -22,28 +22,13 @@ const COLORS = {
     color4: '#db9d29',
 }
 
-//TBC remove this code
-const LOCAL_STORAGE_KEY = 'guiSphere'
-
-// Initialize the numberOfSmallSpheres to store the value
-const numberOfSmallSpheres = {
-    number: 10, // Default value
-}
-
-// Check if the value is already stored in localStorage
-if (localStorage.getItem(LOCAL_STORAGE_KEY)) {
-    numberOfSmallSpheres.number = parseFloat(
-        localStorage.getItem(LOCAL_STORAGE_KEY)
-    )
-}
-
 class ThreeD {
     constructor(pixelRatio, tier, app) {
         //lets set up our three.js scene
 
         this.frames = []
         this.pixelRatio = pixelRatio
-        this.numSmallSpheres = tier.tier > 2 ? numberOfSmallSpheres.number : 6
+        this.numSmallSpheres = tier.tier > 2 ? 10 : 6
 
         this.colDark = sRGBToLinear(COLORS.color1) //Dark
         this.colMid = sRGBToLinear(COLORS.color2) //Light Gold
@@ -65,7 +50,6 @@ class ThreeD {
         //     new THREE.Vector3(-1, -1, -1),
         //     new THREE.Vector3(1, 1, 1)
         // )
-        //this.isMobile = tier.isMobile
         this.mouse = new THREE.Vector3(0, 0, 0)
 
         this.renderer = new THREE.WebGLRenderer({
@@ -77,13 +61,8 @@ class ThreeD {
         this.renderer.setClearColor(0x00000000, 0) // Set background color to black
         this.renderer.sortObjects = false
         this.renderer.autoClear = false
-        //this.canvas = this.renderer.domElement
-        //this.velocity = new THREE.Vector3()
         this.vectorUtil = new THREE.Vector3()
-        //this.vHeight = 0
         this.sphereOpacity = 1.0
-
-        //this.clock = new THREE.Clock()
 
         this.material = new THREE.MeshStandardMaterial({
             color: new THREE.Color(1.0, 0.0, 0.0),
@@ -122,21 +101,14 @@ class ThreeD {
         this.scene.add(this.lightGroup)
         this.group.add(this.metaballs)
 
-        //this.camera.position.z = 10
-        //this.time = 0
-
         this.domEl = this.app.canvasContainer.appendChild(
             this.renderer.domElement
         )
-        // this.domEl.style.zIndex = 10000
-        // this.domEl.style.position = '-webkit-sticky'
-        // this.domEl.style.top = 0
 
         this.lightTop = new THREE.RectAreaLight(0xffffff, 2, 35, 20) //was 0xffffff, 2, 25, 25
         this.lightTop.lookAt(0, 0, 0)
         this.lightBack = new THREE.PointLight(0xfffefa, 10000)
         this.lightGroup.add(this.lightTop)
-        //this.lightGroup.add(this.lightBack)
         this.lightTop.position.set(0, -20, 40)
         this.lightBack.position.set(0, 20, -50)
         // Add lighting
@@ -259,13 +231,12 @@ class ThreeD {
         )
         this.mouse = this.screenToPos(x, y)
         if (isNaN(this.mouse.x) || isNaN(this.mouse.y) || isNaN(this.mouse.z)) {
-            console.error('Invalid mouse position:', this.mouse)
+            // console.error('Invalid mouse position:', this.mouse)
             this.mouse = new THREE.Vector3(0, 0, 0)
         }
     }
 
     setPixelRatio(pixelRatio) {
-        //console.log('Setting pixel ratio', pixelRatio)
         this.renderer.setPixelRatio(pixelRatio)
     }
 
@@ -279,14 +250,9 @@ class ThreeD {
     }
 
     init() {
-        //this.initStatAndGUI()
-
         this.renderer.render(this.scene, this.camera)
         this.metaballs.material = this.backMat
-        // TBC - redundant renderer?
-        //this.renderer.render(this.scene, this.camera)
         this.metaballs.geometry.computeBoundingBox()
-        // this.move({ range: 0, x: 0, y: 0, size: 20, rotation: 0, rotRange: 1}, {x: 0, y:0});
         this.animate()
         this.render()
     }
@@ -385,8 +351,6 @@ class ThreeD {
     }
 
     monitorPerformance(delta) {
-        //this.frames[this.frames.length] = delta
-        //console.log(this.pixelRatio)
         this.frames.push(delta)
         if (this.frames.length >= 45) {
             let total = this.frames.reduce((acc, val) => acc + val)
@@ -395,7 +359,6 @@ class ThreeD {
                 this.pixelRatio = this.pixelRatio - minus
                 this.setPixelRatio(this.pixelRatio)
             }
-
             this.frames = []
         }
     }
@@ -492,7 +455,6 @@ class ThreeD {
     }
 
     animateCamera(axes) {
-        // console.log(axes.transition)
         this.app.canvasContainer.style.opacity = THREE.MathUtils.lerp(
             0,
             axes.transition * 100,
@@ -505,87 +467,15 @@ class ThreeD {
         )
     }
 
-    updateRadius(val) {
-        this.geo.dispose()
-        this.metaballs.geometry = new THREE.IcosahedronGeometry(val, 32)
-    }
-
-    updateColor(val, color = 'colDark') {
-        this.frontMat.userData.shader.uniforms[color].value.setRGB(
-            val.r,
-            val.g,
-            val.b
-        )
-        this.backMat.userData.shader.uniforms[color].value.setRGB(
-            val.r,
-            val.g,
-            val.b
-        )
-    }
-
-    initStatAndGUI() {
-        // TBC - Stats
-        this.stats = new Stats()
-        this.stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-        this.stats.dom.classList.add('stats')
-        document.body.appendChild(this.stats.dom)
-
-        this.gui = new GUI()
-        this.gui.domElement.style.display = 'none'
-        const colorLayers = {
-            front: {
-                color1: 'colDark',
-                color2: 'colMid',
-                color3: 'colLight',
-                color4: 'colGlow',
-            },
-            back: {
-                color1: 'colDark',
-                color2: 'colMid',
-                color3: 'colLight',
-                color4: 'colGlow',
-            },
-        }
-
-        Object.keys(colorLayers).forEach((layer) => {
-            const a = this.gui.addFolder(layer)
-            const innerObject = colorLayers[layer]
-
-            Object.entries(innerObject).forEach(([color, colorName]) => {
-                a.addColor(COLORS, color.toString()).onChange((value) => {
-                    this.updateColor(sRGBToLinear(value), colorName)
-                })
-            })
-        })
-
-        this.obj = { radius: 1.8 }
-        this.gui.add(this.obj, 'radius', 1, 3, 0.01).onChange((value) => {
-            this.updateRadius(value)
-        })
-
-        this.gui
-            .add(numberOfSmallSpheres, 'number', 4, 20, 1)
-            .onChange((newValue) => {
-                // When the value changes, store it in localStorage
-                localStorage.setItem(LOCAL_STORAGE_KEY, newValue)
-            })
-    }
-
     animate() {
         this.getDelta()
-        // TBC - Stats
-        //this.stats.begin()
-
         let axes = this.app.getTimelineValues()
 
-        //console.log(isElementInView(this.app.canvasContainer))
         if (isElementInView(this.app.canvasContainer)) {
             this.animateCamera(axes)
             this.animSpheres(axes)
             this.render()
         }
-        // TBC - Stats
-        //this.stats.end()
 
         requestAnimationFrame(this.animate.bind(this))
     }

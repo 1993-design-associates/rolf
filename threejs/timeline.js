@@ -70,11 +70,8 @@ class animTimeline {
     }
 
     getVals(yScroll) {
-        // console.log('getVals', yScroll)
-        //console.log('axes', this.axes)
         if (!this.timeline) return this.axes
         this.timeline.seek(this.timeline.duration * yScroll)
-        //console.log('axes', this.axes)
         return this.axes
     }
 }
