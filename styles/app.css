@@ -38,7 +38,7 @@ textarea:focus::placeholder {
 /*ensure animated letters can preserve spaces**/
 
 .h1 span.space {
-    width: 0.5ch; /* Adjust to control space width */
+    width: 0.1ch; /* Adjust to control space width */
 }
 /**active form tab style**/
 .form-tab.active .tab-dot {

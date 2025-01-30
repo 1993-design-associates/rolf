@@ -29,6 +29,9 @@ input:focus::placeholder, textarea:focus::placeholder {
   display: inline-block;
 }
 
+.h1 span.space {
+  width: .1ch;
+}
 
 .form-tab.active .tab-dot {
   opacity: 1;
