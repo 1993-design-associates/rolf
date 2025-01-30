@@ -186,8 +186,6 @@ class App {
     }
 }
 
-// const onLoading = () => {}
-
 // async function createTopLeftDomElement(gpuTier, isMobile) {
 //     // Detect the iPad model
 //     const modelText = await isIpadPro()
@@ -261,7 +259,7 @@ const onReady = async () => {
 if (document.readyState !== 'loading') {
     onReady()
 } else {
-    document.addEventListener('DOMContentLoaded', onLoading)
+    //document.addEventListener('DOMContentLoaded', onLoading)
     //window.addEventListener('load', onReady)
     document.addEventListener('DOMContentLoaded', onReady)
 }
