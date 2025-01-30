@@ -10,12 +10,12 @@ const homeHeroTextIn = () => {
 
     // Split text into words, wrap letters in spans, and keep spaces separate
     textElement.innerHTML = textElement.textContent
-    .split(/\s+/) // Split into words
-    .map(word => 
-        `<span class="word">${[...word]
-            .map(letter => `<span class="letter">${letter}</span>`)
-            .join('')}</span>`)
-    .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
+        .split(/\s+/) // Split into words
+        .map(word =>
+            `<span class="word">${[...word]
+                .map(letter => `<span class="letter">${letter}</span>`)
+                .join('')}</span>`)
+        .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
 
 
 
