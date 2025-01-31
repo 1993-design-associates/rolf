@@ -8,14 +8,14 @@ const titleFadeIn = () => {
             .split(/(\s+)/) // Split by spaces, preserving them
             .map(word =>
                 word.trim()
-                    ? `<span class="word">${[...word].map(char => `<span style="opacity: 0;">${char}</span>`).join('')}</span>`
+                    ? `<span class="word">${[...word].map(char => `<span class="letter" style="opacity: 0;">${char}</span>`).join('')}</span>`
                     : `<span class="space">${word}</span>` // Keep spaces separate
             )
             .join('');
 
         // Create an animation for the spans
         const animation = anime({
-            targets: el.querySelectorAll('span'),
+            targets: el.querySelectorAll('.letter'),
             opacity: [0, 1],
             filter: ['blur(10px)', 'blur(0px)'],
             autoplay: false,
