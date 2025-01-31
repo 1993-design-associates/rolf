@@ -5,9 +5,6 @@ import Sphere from './sphere'
 import { sphereMaterial } from './sphereMat.js'
 import { smlSphereMat } from './smlSphereMat.js'
 
-import GUI from 'lil-gui'
-import Stats from 'stats.js'
-
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max)
 
 function sRGBToLinear(hex) {
@@ -390,7 +387,6 @@ class ThreeD {
             this.metaballs.material.userData.shader.uniforms.colGlow.value =
                 this.colGlow
             this.metaballs.material.userData.shader.uniforms.offset.value = 0.0
-            //TBC - THIS RENDERER POSSIBLY NOT NEEDED
             this.renderer.render(this.scene, this.camera)
 
             // render background metaball exterior (front side)
@@ -406,8 +402,6 @@ class ThreeD {
             this.renderer.render(this.scene, this.camera)
 
             //reset material for front metaball exterior (front side)
-            //TBC - removing this improves the performance
-            //The Largest Contentful Paint (LCP) goes from .7 to .3
             this.metaballs.material = this.frontMat
             this.metaballs.material.userData.shader.uniforms.fresnelScale.value = 1.0
             this.metaballs.material.userData.shader.uniforms.minOpacity.value = 0
