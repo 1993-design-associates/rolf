@@ -5,7 +5,7 @@ const textIn = () => {
 
         // Break text into spans
         el.innerHTML = [...el.textContent]
-            .map(char => `<span${char === ' ' ? ' class="space"' : ''} style="opacity: 0;">${char}</span>`)
+            .map(char => `<span${char === ' ' ? ' class="space"' : ''} ">${char}</span>`)
             .join('');
 
         // Create an animation for the spans

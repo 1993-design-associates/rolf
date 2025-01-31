@@ -1,8 +1,9 @@
 import anime from "animejs";
 
 const titleFadeIn = () => {
-    document.querySelectorAll('.title-fade').forEach(el => {
+    const titleElements = document.querySelectorAll('.title-fade');
 
+    titleElements.forEach(el => {
         // Break text into spans but keep words intact
         el.innerHTML = el.textContent
             .split(/(\s+)/) // Split by spaces, preserving them
@@ -14,8 +15,9 @@ const titleFadeIn = () => {
             .join('');
 
         // Create an animation for the spans
+        const letters = el.querySelectorAll('.letter');
         const animation = anime({
-            targets: el.querySelectorAll('.letter'),
+            targets: letters,
             opacity: [0, 1],
             filter: ['blur(10px)', 'blur(0px)'],
             autoplay: false,
@@ -29,8 +31,8 @@ const titleFadeIn = () => {
         // Add scroll listener for this element
         const onScroll = () => {
             const rect = el.getBoundingClientRect();
-            const startTrigger = window.innerHeight * 0.25; // 75% of viewport height
-            const endTrigger = window.innerHeight * 0.85; // 25% of viewport height
+            const startTrigger = window.innerHeight * 0.25; // 25% of viewport height
+            const endTrigger = window.innerHeight * 0.85; // 85% of viewport height
 
             // Calculate normalized scroll percent (0 to 1)
             const scrollPercent = Math.min(
