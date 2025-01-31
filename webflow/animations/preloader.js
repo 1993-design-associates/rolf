@@ -1,22 +1,22 @@
-import anime from 'animejs'
-import smoothScroll from './smoothScroll'
+import anime from 'animejs';
+import smoothScroll from './smoothScroll';
 
 const homeHeroTextIn = () => {
     const textElement = document.querySelector('.h1');
+    if (!textElement) return;
 
-    // Get the data-direction value or default to 'center' if not specified
     const direction = textElement.dataset.direction || 'center';
-    const staggerGap  = textElement.dataset.staggergap || '100';
+    const staggerGap = parseInt(textElement.dataset.staggergap, 10) || 100;
 
     // Split text into words, wrap letters in spans, and keep spaces separate
     textElement.innerHTML = textElement.textContent
-        .split(/\s+/) // Split into words
+        .split(/\s+/)
         .map(word =>
             `<span class="word">${[...word]
                 .map(letter => `<span class="letter">${letter}</span>`)
-                .join('')}</span>`)
+                .join('')}</span>`
+        )
         .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
-
 
     // Animate each letter
     anime.timeline({ autoplay: true }).add({
@@ -30,42 +30,43 @@ const homeHeroTextIn = () => {
     });
 };
 
-
 const preloaderAnime = () => {
-    //disable page scrolling until the preloader and hero text animation finishes
-    //scroll is enabled in line 57
-    document.body.style.overflow = 'hidden'
+    const body = document.body;
+    const preloaderCircles = document.querySelectorAll('.preloader-circle');
+    const loaderTrigger = document.querySelector('#loader-trigger');
+
+    if (!body || !preloaderCircles.length || !loaderTrigger) return;
+
+    // Disable page scrolling until the preloader and hero text animation finishes
+    body.style.overflow = 'hidden';
 
     // Set the initial state of the circles
-    document.querySelectorAll('.preloader-circle').forEach((circle) => {
-        circle.style.transform = 'scale(0)'
-        circle.style.opacity = '0'
-    })
+    preloaderCircles.forEach(circle => {
+        circle.style.transform = 'scale(0)';
+        circle.style.opacity = '0';
+    });
 
     anime({
-        targets: '.preloader-circle',
+        targets: preloaderCircles,
         scale: [
-            { value: 0.5, duration: 0 }, // Initial state
+            { value: 0.5, duration: 0 },
             { value: 1, duration: 1550, easing: 'easeOutQuart' },
         ],
         opacity: [
-            { value: 0, duration: 0 }, // Initial state
-            { value: 0.5, duration: 1000, easing: 'easeOutExpo' }, // Fade in
-            { value: 0, duration: 500, easing: 'easeInOutSine' }, // Fade out (ends with scale)
+            { value: 0, duration: 0 },
+            { value: 0.5, duration: 1000, easing: 'easeOutExpo' },
+            { value: 0, duration: 500, easing: 'easeInOutSine' },
         ],
         delay: anime.stagger(-250, {
-            start:
-                300 *
-                (document.querySelectorAll('.preloader-circle').length - 1),
+            start: 300 * (preloaderCircles.length - 1),
         }),
-        complete: function () {
-            smoothScroll()
-            document.body.style.overflow = ''
-            // Trigger the loader and start the hero text animation
-            document.querySelector('#loader-trigger').click()
-            homeHeroTextIn()
+        complete: () => {
+            smoothScroll();
+            body.style.overflow = '';
+            loaderTrigger.click();
+            homeHeroTextIn();
         },
-    })
-}
+    });
+};
 
-export default preloaderAnime
+export default preloaderAnime;
