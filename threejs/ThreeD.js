@@ -37,16 +37,13 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            tier.isMobile ? 55 : 32,
+            32,
             this.width / this.height,
             0.1,
             1000
         )
         this.camera.position.z = 30 // Set camera position to view the object
-        // this.bbox = new THREE.Box3(
-        //     new THREE.Vector3(-1, -1, -1),
-        //     new THREE.Vector3(1, 1, 1)
-        // )
+
         this.mouse = new THREE.Vector3(0, 0, 0)
 
         this.renderer = new THREE.WebGLRenderer({
