@@ -37,7 +37,7 @@ class ThreeD {
         this.width = window.innerWidth
         this.scene = new THREE.Scene()
         this.camera = new THREE.PerspectiveCamera(
-            tier.isMobile && this.width < 991 ? 55 : 32, //set smaller sphere for mobile and ipad potrait mode
+            tier.isMobile && this.width < 1025 ? 55 : 32, //set smaller sphere for mobile and ipad potrait mode
             this.width / this.height,
             0.1,
             1000
