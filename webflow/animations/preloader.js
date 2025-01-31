@@ -6,7 +6,7 @@ const homeHeroTextIn = () => {
 
     // Get the data-direction value or default to 'center' if not specified
     const direction = textElement.dataset.direction || 'center';
-    const speed = textElement.dataset.speed || '1500';
+    const staggerGap  = textElement.dataset.staggergap || '100';
 
     // Split text into words, wrap letters in spans, and keep spaces separate
     textElement.innerHTML = textElement.textContent
@@ -18,17 +18,15 @@ const homeHeroTextIn = () => {
         .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
 
 
-
-
     // Animate each letter
     anime.timeline({ autoplay: true }).add({
         targets: '.h1 .letter',
         translateY: [-25, 0],
         opacity: [0, 1],
         filter: ['blur(10px)', 'blur(0px)'],
-        duration: speed,
-        easing: 'easeOutCubic',
-        delay: anime.stagger(100, { start: 900, from: direction }), // Use the direction value
+        duration: 1000,
+        easing: 'easeOutQuad',
+        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each elements by default
     });
 };
 
