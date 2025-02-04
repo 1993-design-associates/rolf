@@ -1,6 +1,6 @@
 /** custom scrollbar**/
 ::-webkit-scrollbar {
-    width: 0.25vw;
+    width: 0.8rem;
     padding: 5px;
 }
 
@@ -10,7 +10,7 @@
 
 ::-webkit-scrollbar-thumb {
     background: #9a9376;
-    border-radius: 0px;
+    border-radius: 100vw;
 }
 
 /** custom selection colour**/
