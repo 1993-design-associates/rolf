@@ -24,14 +24,14 @@
 }
 
 .popup-parent::-webkit-scrollbar-thumb {
-    background: #9A9376;
+    background: rgba(154, 147, 118, 0.35);
     border-radius: 100vw;
 }
 
 /* Firefox scrollbar styling */
 .popup-parent {
     scrollbar-width: thin;
-    scrollbar-color: #9A9376 #FCF6E1;
+    scrollbar-color: rgba(154, 147, 118, 0.35) #FCF6E1;
 }
 
 /** custom selection colour**/

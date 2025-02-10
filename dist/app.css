@@ -21,13 +21,13 @@
 }
 
 .popup-parent::-webkit-scrollbar-thumb {
-  background: #9a9376;
+  background: #9a937659;
   border-radius: 100vw;
 }
 
 .popup-parent {
   scrollbar-width: thin;
-  scrollbar-color: #9a9376 #fcf6e1;
+  scrollbar-color: #9a937659 #fcf6e1;
 }
 
 ::selection {
