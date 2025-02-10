@@ -9,6 +9,8 @@ import ThreeD from './threejs/ThreeD.js'
 import animTimeline from './threejs/timeline.js'
 
 import initWebflowFunctions from './webflow/main.js'
+import preloaderAnime from './webflow/animations/preloader.js'
+
 
 class App {
     constructor(tier) {
@@ -51,6 +53,7 @@ class App {
     }
 
     onResize() {
+        preloaderAnime
         this.height = window.innerHeight
         this.contHeight = this.container.scrollHeight
         this.width = window.innerWidth
