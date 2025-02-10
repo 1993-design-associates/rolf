@@ -12,6 +12,24 @@
   border-radius: 100vw;
 }
 
+.popup-parent::-webkit-scrollbar {
+  width: .3rem;
+}
+
+.popup-parent::-webkit-scrollbar-track {
+  background: #fcf6e1;
+}
+
+.popup-parent::-webkit-scrollbar-thumb {
+  background: #9a9376;
+  border-radius: 100vw;
+}
+
+.popup-parent {
+  scrollbar-width: thin;
+  scrollbar-color: #9a9376 #fcf6e1;
+}
+
 ::selection {
   color: #2f3720;
   background: #f0c464;

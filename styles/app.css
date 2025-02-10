@@ -5,7 +5,8 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: #0f0f0c; /* Sets the background to transparent, change to a Hex or RGB value if you would like */
+    background: #0f0f0c;
+    /* Sets the background to transparent, change to a Hex or RGB value if you would like */
 }
 
 ::-webkit-scrollbar-thumb {
@@ -13,14 +14,36 @@
     border-radius: 100vw;
 }
 
+/* custom scrollbar for contact popup */
+.popup-parent::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+.popup-parent::-webkit-scrollbar-track {
+    background: #FCF6E1;
+}
+
+.popup-parent::-webkit-scrollbar-thumb {
+    background: #9A9376;
+    border-radius: 100vw;
+}
+
+/* Firefox scrollbar styling */
+.popup-parent {
+    scrollbar-width: thin;
+    scrollbar-color: #9A9376 #FCF6E1;
+}
+
 /** custom selection colour**/
 ::selection {
-    background: #f0c464; /* WebKit/Blink Browsers */
+    background: #f0c464;
+    /* WebKit/Blink Browsers */
     color: #2f3720;
 }
 
 ::-moz-selection {
-    background: #f0c464; /* Gecko Browsers */
+    background: #f0c464;
+    /* Gecko Browsers */
 }
 
 /*ensure placeholder text disappea when clicks on the form field*/
@@ -28,18 +51,23 @@
 input:focus::placeholder {
     color: transparent;
 }
+
 textarea:focus::placeholder {
     color: transparent;
 }
+
 /*ensure animated letters can transform**/
 .h1 span {
     display: inline-block;
 }
+
 /*ensure animated letters can preserve spaces**/
 
 .h1 span.space {
-    width: 0.1ch; /* Adjust to control space width */
+    width: 0.1ch;
+    /* Adjust to control space width */
 }
+
 /**active form tab style**/
 .form-tab.active .tab-dot {
     opacity: 1;
@@ -53,9 +81,11 @@ textarea:focus::placeholder {
 .tab-cms-item.active .article-dot {
     opacity: 1;
 }
+
 .tab-cms-item.active .blur-wrap {
     opacity: 1;
 }
+
 .tab-cms-item.active .article-img {
     transform: scale(1);
     opacity: 1;
@@ -66,6 +96,7 @@ textarea:focus::placeholder {
     padding-left: 1.6rem;
     -webkit-text-stroke-width: 1px;
 }
+
 .tab-cms-item.active {
     z-index: 1;
 }
