@@ -1,8 +1,6 @@
 import anime from 'animejs';
 import smoothScroll from './smoothScroll';
 
-let hasLoaded = false; // Flag to track if the page has already been loaded
-
 const homeHeroTextIn = () => {
     const textElement = document.querySelector('.h1');
     if (!textElement) return;
@@ -28,21 +26,11 @@ const homeHeroTextIn = () => {
         filter: ['blur(10px)', 'blur(0px)'],
         duration: 1000,
         easing: 'easeOutQuad',
-        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
+        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each elements by default
     });
 };
 
-// Destroy preloader elements after load, resize, or zoom events
-const destroyPreloader = () => {
-    const preloader = document.querySelector('.preloader');
-    if (preloader) {
-        preloader.remove();
-    }
-};
-
 const preloaderAnime = () => {
-    if (hasLoaded) return; // Prevent running animation if already loaded
-
     const body = document.body;
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
@@ -77,20 +65,7 @@ const preloaderAnime = () => {
             body.style.overflow = '';
             loaderTrigger.click();
             homeHeroTextIn();
-            hasLoaded = true; // Set flag after the first load is complete
         },
-    });
-
-    // Attach event listeners for resize and zoom only once
-    const handleResizeZoom = () => destroyPreloader();
-    window.addEventListener('resize', handleResizeZoom);
-    window.addEventListener('zoom', handleResizeZoom);
-
-    // Remove event listeners after they are no longer needed
-    window.addEventListener('load', () => {
-        preloaderAnime();
-        window.removeEventListener('resize', handleResizeZoom);
-        window.removeEventListener('zoom', handleResizeZoom);
     });
 };
 
