@@ -31,6 +31,7 @@ const homeHeroTextIn = () => {
         delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
     });
 };
+
 // Destroy preloader elements after load, resize, or zoom events
 const destroyPreloader = () => {
     const preloader = document.querySelector('.preloader');
@@ -40,11 +41,13 @@ const destroyPreloader = () => {
 };
 
 const preloaderAnime = () => {
+    if (hasLoaded) return; // Prevent running animation if already loaded
+
     const body = document.body;
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
 
-    if (!body || !preloaderCircles.length || !loaderTrigger || hasLoaded) return;
+    if (!body || !preloaderCircles.length || !loaderTrigger) return;
 
     // Disable page scrolling until the preloader and hero text animation finishes
     body.style.overflow = 'hidden';
@@ -77,15 +80,18 @@ const preloaderAnime = () => {
             hasLoaded = true; // Set flag after the first load is complete
         },
     });
-    // Event listeners for resize and zoom
-window.addEventListener('resize', destroyPreloader);
-window.addEventListener('zoom', destroyPreloader); // In case zoom is detected
 
-// Trigger the preloader animation when the page loads
-window.addEventListener('load', preloaderAnime);
+    // Attach event listeners for resize and zoom only once
+    const handleResizeZoom = () => destroyPreloader();
+    window.addEventListener('resize', handleResizeZoom);
+    window.addEventListener('zoom', handleResizeZoom);
+
+    // Remove event listeners after they are no longer needed
+    window.addEventListener('load', () => {
+        preloaderAnime();
+        window.removeEventListener('resize', handleResizeZoom);
+        window.removeEventListener('zoom', handleResizeZoom);
+    });
 };
-
-
-
 
 export default preloaderAnime;
