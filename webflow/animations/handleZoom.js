@@ -1,35 +1,30 @@
 const handleZoom = () => {
-    // Store the initial scale and window dimensions
-    let initialScale = window.visualViewport.scale;
-    let initialWidth = window.innerWidth;
-    let initialHeight = window.innerHeight;
-
-    // Function to handle the zoom event
-    const handleZoomEvent = () => {
-        const currentScale = window.visualViewport.scale;
-
-        // Check if the scale has changed (zooming in or out)
-        if (currentScale !== initialScale) {
-            // Calculate the new dimensions based on the zoom level
-            const newWidth = initialWidth / currentScale;
-            const newHeight = initialHeight / currentScale;
-
-            // Adjust the viewport or layout to prevent shifting
-            document.body.style.width = `${newWidth}px`;
-            document.body.style.height = `${newHeight}px`;
-            document.body.style.transform = `scale(${currentScale})`;
-            document.body.style.transformOrigin = 'top left';
-
-            // Update the initial scale and dimensions
-            initialScale = currentScale;
-            initialWidth = newWidth;
-            initialHeight = newHeight;
-        }
-    };
-
-    // Attach the event listeners to the visualViewport
-    window.visualViewport.addEventListener('resize', handleZoomEvent);
-    window.visualViewport.addEventListener('scroll', handleZoomEvent);
-};
-
-export default handleZoom;
+    let lastScale = 1;
+  
+    document.addEventListener("gesturestart", (e) => {
+      e.preventDefault();
+    });
+  
+    document.addEventListener("gesturechange", (e) => {
+      const currentScale = e.scale;
+      const scrollTop = window.scrollY;
+      const scrollLeft = window.scrollX;
+  
+      if (currentScale !== lastScale) {
+        document.body.style.transform = `scale(${1 / currentScale})`;
+        document.body.style.transformOrigin = "0 0";
+        document.body.style.width = `${currentScale * 100}%`;
+      }
+  
+      window.scrollTo(scrollLeft, scrollTop);
+      lastScale = currentScale;
+    });
+  
+    document.addEventListener("gestureend", () => {
+      document.body.style.transform = "";
+      document.body.style.width = "";
+    });
+  };
+  
+  export default handleZoom;
+  
