@@ -13,8 +13,7 @@ const homeHeroTextIn = () => {
         .split(/\s+/)
         .map(word =>
             `<span class="word">${[...word]
-                .map(letter => `<span class="letter">${letter}</span>`)
-                .join('')}</span>`
+                .map(letter => `<span class="letter">${letter}</span>`).join('')}</span>`
         )
         .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
 
@@ -26,16 +25,21 @@ const homeHeroTextIn = () => {
         filter: ['blur(10px)', 'blur(0px)'],
         duration: 1000,
         easing: 'easeOutQuad',
-        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each elements by default
+        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
     });
 };
 
 const preloaderAnime = () => {
+    if (sessionStorage.getItem('preloaderPlayed')) return; // Prevent running again on resize/zoom
+
     const body = document.body;
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
 
     if (!body || !preloaderCircles.length || !loaderTrigger) return;
+
+    // Mark the animation as played
+    sessionStorage.setItem('preloaderPlayed', 'true');
 
     // Disable page scrolling until the preloader and hero text animation finishes
     body.style.overflow = 'hidden';
@@ -68,5 +72,10 @@ const preloaderAnime = () => {
         },
     });
 };
+
+// Reset sessionStorage when the page is refreshed
+window.addEventListener('beforeunload', () => {
+    sessionStorage.removeItem('preloaderPlayed');
+});
 
 export default preloaderAnime;
