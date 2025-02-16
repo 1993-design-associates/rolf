@@ -31,6 +31,13 @@ const homeHeroTextIn = () => {
         delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
     });
 };
+// Destroy preloader elements after load, resize, or zoom events
+const destroyPreloader = () => {
+    const preloader = document.querySelector('.preloader');
+    if (preloader) {
+        preloader.remove();
+    }
+};
 
 const preloaderAnime = () => {
     const body = document.body;
@@ -70,21 +77,15 @@ const preloaderAnime = () => {
             hasLoaded = true; // Set flag after the first load is complete
         },
     });
-};
-
-// Destroy preloader elements after load, resize, or zoom events
-const destroyPreloader = () => {
-    const preloader = document.querySelector('.preloader');
-    if (preloader) {
-        preloader.remove();
-    }
-};
-
-// Event listeners for resize and zoom
+    // Event listeners for resize and zoom
 window.addEventListener('resize', destroyPreloader);
 window.addEventListener('zoom', destroyPreloader); // In case zoom is detected
 
 // Trigger the preloader animation when the page loads
 window.addEventListener('load', preloaderAnime);
+};
+
+
+
 
 export default preloaderAnime;
