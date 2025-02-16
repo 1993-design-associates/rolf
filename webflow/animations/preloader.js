@@ -1,6 +1,24 @@
 import anime from 'animejs';
 import smoothScroll from './smoothScroll';
 
+const hidePreloader = () => {
+    const preloader = document.querySelector('#preloader');
+    if (!preloader) return;
+
+    // Animate the preloader to fade out and scale down
+    anime({
+        targets: preloader,
+        opacity: [1, 0], // Fade out
+        duration: 500, // Animation duration
+        easing: 'easeOutQuad',
+        complete: () => {
+            // Set display to none once the animation is complete
+            preloader.style.display = 'none';
+        },
+    });
+};
+
+
 const homeHeroTextIn = () => {
     const textElement = document.querySelector('.h1');
     if (!textElement) return;
@@ -13,7 +31,8 @@ const homeHeroTextIn = () => {
         .split(/\s+/)
         .map(word =>
             `<span class="word">${[...word]
-                .map(letter => `<span class="letter">${letter}</span>`).join('')}</span>`
+                .map(letter => `<span class="letter">${letter}</span>`)
+                .join('')}</span>`
         )
         .join(' <span class="space">&nbsp;</span>'); // Preserve spaces
 
@@ -25,26 +44,21 @@ const homeHeroTextIn = () => {
         filter: ['blur(10px)', 'blur(0px)'],
         duration: 1000,
         easing: 'easeOutQuad',
-        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
+        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each elements by default
     });
 };
 
 const preloaderAnime = () => {
     const body = document.body;
-    const preloaderContainer = document.querySelector('#preloader'); // Add preloader container reference
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
+    const preloader = document.querySelector('#preloader');
 
-    if (!body || !preloaderContainer || !preloaderCircles.length || !loaderTrigger) return;
+    // Set initial state of the preloader
+    preloader.style.display = 'flex';
+    preloader.style.opacity = '1';
 
-    // If animation already ran, make sure preloader stays hidden
-    if (sessionStorage.getItem('preloaderPlayed')) {
-        preloaderContainer.style.display = 'none';
-        return;
-    }
-
-    // Mark animation as played
-    sessionStorage.setItem('preloaderPlayed', 'true');
+    if (!body || !preloaderCircles.length || !loaderTrigger) return;
 
     // Disable page scrolling until the preloader and hero text animation finishes
     body.style.overflow = 'hidden';
@@ -72,19 +86,12 @@ const preloaderAnime = () => {
         complete: () => {
             smoothScroll();
             body.style.overflow = '';
-
-            // Hide the preloader container completely
-            preloaderContainer.style.display = 'none';
+            hidePreloader();
 
             loaderTrigger.click();
             homeHeroTextIn();
         },
     });
 };
-
-// Reset sessionStorage when the page is refreshed
-window.addEventListener('beforeunload', () => {
-    sessionStorage.removeItem('preloaderPlayed');
-});
 
 export default preloaderAnime;
