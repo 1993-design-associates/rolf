@@ -1,23 +1,7 @@
 import anime from 'animejs';
 import smoothScroll from './smoothScroll';
 
-const hidePreloader = () => {
-    const preloader = document.querySelector('#preloader');
-    if (!preloader) return;
-
-    // Animate the preloader to fade out and scale down
-    anime({
-        targets: preloader,
-        opacity: [1, 0], // Fade out
-        duration: 500, // Animation duration
-        easing: 'easeOutQuad',
-        complete: () => {
-            // Set display to none once the animation is complete
-            preloader.style.display = 'none';
-        },
-    });
-};
-
+let hasLoaded = false; // Flag to track if the page has already been loaded
 
 const homeHeroTextIn = () => {
     const textElement = document.querySelector('.h1');
@@ -44,7 +28,7 @@ const homeHeroTextIn = () => {
         filter: ['blur(10px)', 'blur(0px)'],
         duration: 1000,
         easing: 'easeOutQuad',
-        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each elements by default
+        delay: anime.stagger(staggerGap, { start: 450, from: direction }), // delay starts at 450ms then increase by 100ms for each element by default
     });
 };
 
@@ -52,13 +36,8 @@ const preloaderAnime = () => {
     const body = document.body;
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
-    const preloader = document.querySelector('#preloader');
 
-    // Set initial state of the preloader
-    preloader.style.display = 'flex';
-    preloader.style.opacity = '1';
-
-    if (!body || !preloaderCircles.length || !loaderTrigger) return;
+    if (!body || !preloaderCircles.length || !loaderTrigger || hasLoaded) return;
 
     // Disable page scrolling until the preloader and hero text animation finishes
     body.style.overflow = 'hidden';
@@ -86,12 +65,26 @@ const preloaderAnime = () => {
         complete: () => {
             smoothScroll();
             body.style.overflow = '';
-            hidePreloader();
-
             loaderTrigger.click();
             homeHeroTextIn();
+            hasLoaded = true; // Set flag after the first load is complete
         },
     });
 };
+
+// Destroy preloader elements after load, resize, or zoom events
+const destroyPreloader = () => {
+    const preloader = document.querySelector('.preloader');
+    if (preloader) {
+        preloader.remove();
+    }
+};
+
+// Event listeners for resize and zoom
+window.addEventListener('resize', destroyPreloader);
+window.addEventListener('zoom', destroyPreloader); // In case zoom is detected
+
+// Trigger the preloader animation when the page loads
+window.addEventListener('load', preloaderAnime);
 
 export default preloaderAnime;
