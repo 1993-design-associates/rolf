@@ -3,6 +3,8 @@ import btnHover from './animations/btnHover'
 import burgerMenuOpen from './animations/burgerMenuOpen'
 import titleFadeIn from './animations/titleFadeIn'
 import textIn from './animations/textIn'
+import handleZoom from './animations/handleZoom'
+
 
 import contactTabClick from './button-functions/contactTabClick'
 import formTab from './button-functions/formTab'
@@ -13,6 +15,7 @@ import pageTransition from './button-functions/pageTransition'
 
 export default function initWebflowFunctions() {
     preloaderAnime()
+    handleZoom()
     contactTabClick()
     formTab()
     btnHover()
