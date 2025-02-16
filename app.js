@@ -53,7 +53,6 @@ class App {
     }
 
     onResize() {
-        preloaderAnime
         this.height = window.innerHeight
         this.contHeight = this.container.scrollHeight
         this.width = window.innerWidth
