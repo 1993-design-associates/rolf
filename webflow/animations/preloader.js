@@ -30,15 +30,20 @@ const homeHeroTextIn = () => {
 };
 
 const preloaderAnime = () => {
-    if (sessionStorage.getItem('preloaderPlayed')) return; // Prevent running again on resize/zoom
-
     const body = document.body;
+    const preloaderContainer = document.querySelector('#preloader'); // Add preloader container reference
     const preloaderCircles = document.querySelectorAll('.preloader-circle');
     const loaderTrigger = document.querySelector('#loader-trigger');
 
-    if (!body || !preloaderCircles.length || !loaderTrigger) return;
+    if (!body || !preloaderContainer || !preloaderCircles.length || !loaderTrigger) return;
 
-    // Mark the animation as played
+    // If animation already ran, make sure preloader stays hidden
+    if (sessionStorage.getItem('preloaderPlayed')) {
+        preloaderContainer.style.display = 'none';
+        return;
+    }
+
+    // Mark animation as played
     sessionStorage.setItem('preloaderPlayed', 'true');
 
     // Disable page scrolling until the preloader and hero text animation finishes
@@ -67,6 +72,10 @@ const preloaderAnime = () => {
         complete: () => {
             smoothScroll();
             body.style.overflow = '';
+
+            // Hide the preloader container completely
+            preloaderContainer.style.display = 'none';
+
             loaderTrigger.click();
             homeHeroTextIn();
         },
