@@ -12,6 +12,7 @@ import initWebflowFunctions from './webflow/main.js'
 
 class App {
     constructor(tier) {
+        this.visited = false
         this.timeline = new animTimeline()
         this.tier = tier
         this.mouse = { x: 0.5, y: 0.5 }
@@ -43,6 +44,7 @@ class App {
     }
 
     init() {
+        this.visited = false
         this.timeline.init(this.contHeight, this.height)
         this.onScroll()
         this.canvasContainer.style.height = `${this.height}px`
@@ -51,6 +53,7 @@ class App {
     }
 
     onResize() {
+        this.visited = true
         this.height = window.innerHeight
         this.contHeight = this.container.scrollHeight
         this.width = window.innerWidth
@@ -90,7 +93,9 @@ class App {
 
         window.addEventListener('resize', () => {
             _resize()
-            initWebflowFunctions()
+            if (this.visited) {
+                disablePreloader()
+            }
         })
 
         window.visualViewport.addEventListener('resize', () => {
@@ -118,6 +123,11 @@ class App {
         this.mse.y = event.clientY
         this.threeD.onMouseMove(this.mouse.x, this.mouse.y)
     }
+}
+
+function disablePreloader() {
+    const preloader = document.getElementById('preloader')
+    if (preloader) preloader.style.display = 'none'
 }
 
 // function isIpadPro() {

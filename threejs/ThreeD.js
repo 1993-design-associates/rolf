@@ -339,9 +339,10 @@ class ThreeD {
                 // Update the debug sphere position
                 this.debugMouse.position.set(position.x, position.y, position.z)
             }
-        } else {
-            console.error('RAPIER world is not initialized.')
         }
+        //else {
+        //console.error('RAPIER world is not initialized.')
+        //}
     }
 
     monitorPerformance(delta) {
