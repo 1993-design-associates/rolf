@@ -9,8 +9,6 @@ import ThreeD from './threejs/ThreeD.js'
 import animTimeline from './threejs/timeline.js'
 
 import initWebflowFunctions from './webflow/main.js'
-import preloaderAnime from './webflow/animations/preloader.js'
-
 
 class App {
     constructor(tier) {
@@ -70,6 +68,8 @@ class App {
         this.y = this.scroll.value
         this.container.scrollTop = this.scroll.value
         this.onScroll()
+
+        //initWebflowFunctions()
     }
 
     onLoaded() {
@@ -90,6 +90,7 @@ class App {
 
         window.addEventListener('resize', () => {
             _resize()
+            initWebflowFunctions()
         })
 
         window.visualViewport.addEventListener('resize', () => {
@@ -153,5 +154,4 @@ if (document.readyState !== 'loading') {
     onReady()
 } else {
     document.addEventListener('DOMContentLoaded', onReady)
-
 }
