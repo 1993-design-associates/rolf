@@ -23,6 +23,5 @@ export default function initWebflowFunctions() {
     burgerMenuOpen()
     backBtnClick()
     pageTransition()
-    window.addEventListener('resize', preloaderAnime);
 
 }
