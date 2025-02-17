@@ -130,7 +130,6 @@ class App {
 const onReady = async () => {
     //Initialize all custom js functions used in webflow
     initWebflowFunctions()
-    window.addEventListener('resize', preloaderAnime);
 
     let GPUTier = await getGPUTier()
 
