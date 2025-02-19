@@ -70,7 +70,7 @@ const preloaderAnime = () => {
             homeHeroTextIn()
 
             // Remove the preloader from the DOM after animation completes
-            preloader.remove()
+            //preloader.remove()
         },
     })
 
